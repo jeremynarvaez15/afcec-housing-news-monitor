@@ -13,6 +13,11 @@ def test_risk_colors_unknown_level_returns_fallback():
     assert colors["stripe"] == styles._UNKNOWN_COLOR["stripe"]
 
 
+def test_how_to_use_text_covers_risk_levels_and_filters():
+    for term in ("Critical", "High", "Medium", "Low", "Refresh now", "Air Force / Space Force"):
+        assert term in styles.HOW_TO_USE_TEXT
+
+
 def test_render_header_html_contains_title_and_color():
     html = styles.render_header_html()
     assert styles.APP_TITLE in html

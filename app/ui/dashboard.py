@@ -15,6 +15,7 @@ from app.ui.styles import (
     render_section_header_html,
     render_article_card_html,
     render_resources_section_html,
+    HOW_TO_USE_TEXT,
 )
 
 _RISK_LEVELS = ["Critical", "High", "Medium", "Low"]
@@ -63,6 +64,9 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
     inject_base_styles()
     st.markdown(render_header_html(), unsafe_allow_html=True)
     st.markdown(render_disclaimer_html(), unsafe_allow_html=True)
+
+    with st.expander("How to Use This Site"):
+        st.markdown(HOW_TO_USE_TEXT)
 
     if key_missing:
         st.info("Add ANTHROPIC_API_KEY to your secrets to enable risk assessment.")

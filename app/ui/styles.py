@@ -24,6 +24,31 @@ _UNKNOWN_COLOR = {"stripe": "#B0B0B0", "bg": "#F0F0F0", "text": "#707070"}
 
 _RISK_ICON = {"Critical": "⚠", "High": "⚠", "Medium": "●", "Low": "●"}
 
+HOW_TO_USE_TEXT = """\
+**What this is:** This tool scans military/defense and general news for coverage of \
+MHPI, privatized housing, dorms, barracks, and DoD-owned housing, summarizes each \
+article with AI, and flags its reputational/operational risk to the Air Force.
+
+**Risk levels:**
+- 🔴 **Critical** — safety incidents, deaths, criminal charges, active investigations
+- 🟠 **High** — health/safety hazard exposés, lawsuits, GAO reports, systemic problems
+- 🟡 **Medium** — tenant complaints, contractor disputes, funding/policy news
+- ⚪ **Low** — routine announcements, minor coverage
+
+**Using the filters (left sidebar):**
+- Check or uncheck risk levels to show only what you care about
+- "Air Force / Space Force specific only" narrows the feed to AF/SSF-specific stories
+- Use the search box to find articles by keyword
+- Click "Refresh now" to check for new articles immediately — otherwise the feed \
+refreshes automatically about once an hour
+
+**Resources:** Links at the bottom of the page point to independent advocacy and \
+watchdog organizations for further reading.
+
+**A note on AI risk levels:** These are AI-generated starting points, not official \
+determinations — always apply your own judgment before acting on them.
+"""
+
 RESOURCE_LINKS = [
     {
         "name": "Change the Air Foundation",
