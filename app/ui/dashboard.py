@@ -55,6 +55,18 @@ def _render_feed_section(title: str, articles: list[dict], empty_message: str) -
                 st.markdown(render_article_card_html(article), unsafe_allow_html=True)
 
 
+def _render_af_specific_cards(articles: list[dict], empty_message: str) -> None:
+    # No 20-item cap / "show more" expander here, unlike _render_feed_section —
+    # Streamlit doesn't allow nesting an expander inside another expander, and
+    # this section is itself wrapped in one. The AF/SSF-specific subset is
+    # expected to stay small since it's already a slice of a low-volume feed.
+    if not articles:
+        st.info(empty_message)
+        return
+    for article in articles:
+        st.markdown(render_article_card_html(article), unsafe_allow_html=True)
+
+
 def _render_resources_section(source_names: list[str]) -> None:
     with st.expander("Resources"):
         st.markdown(render_resources_section_html(source_names), unsafe_allow_html=True)
@@ -139,11 +151,11 @@ def render_dashboard(
     )
 
     af_feed = sort_by_risk(filter_af_specific(filtered))
-    _render_feed_section(
-        "Air Force / Space Force Specific",
-        af_feed,
-        "No Air Force/Space Force-specific stories in the last week. Check back soon.",
-    )
+    with st.expander("Air Force / Space Force Specific"):
+        _render_af_specific_cards(
+            af_feed,
+            "No Air Force/Space Force-specific stories in the last week. Check back soon.",
+        )
 
     _render_resources_section(source_names)
 
