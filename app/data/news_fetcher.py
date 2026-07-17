@@ -20,12 +20,18 @@ _FEEDS = [
 _TOPIC_KEYWORDS = {
     "mhpi", "military housing privatization", "privatized housing", "barracks",
     "dorms", "dormitory", "dod-owned housing", "dod owned housing", "base housing",
+    "quality of life", "installation housing",
 }
 
 _PARTNER_NAMES = {
     "balfour beatty communities", "hunt military communities", "mayroad",
     "centinel", "burlington capital", "wright field development",
     "jl properties", "boyer hill", "the michaels organization",
+}
+
+_ADVOCACY_NAMES = {
+    "change the air foundation", "project on government oversight",
+    "national military family association",
 }
 
 _AMBIGUOUS_NAMES = {
@@ -73,6 +79,9 @@ def _matches_keywords(title: str, description: str) -> bool:
         if kw in text:
             return True
     for name in _PARTNER_NAMES:
+        if _name_matches(name, text):
+            return True
+    for name in _ADVOCACY_NAMES:
         if _name_matches(name, text):
             return True
     return False

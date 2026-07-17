@@ -31,6 +31,20 @@ def test_matches_keywords_unrelated_story_returns_false():
     assert _matches_keywords("Local football team wins championship", "") is False
 
 
+def test_matches_keywords_quality_of_life_term():
+    assert _matches_keywords("Base leaders address quality of life concerns", "") is True
+
+
+def test_matches_keywords_installation_housing_term():
+    assert _matches_keywords("Installation housing inspections underway", "") is True
+
+
+def test_matches_keywords_advocacy_org_name():
+    assert _matches_keywords(
+        "Advocates weigh in", "Project On Government Oversight released a new report"
+    ) is True
+
+
 def test_name_matches_rejects_short_ambiguous_name():
     assert _name_matches("JL", "jl properties announced today") is False
 

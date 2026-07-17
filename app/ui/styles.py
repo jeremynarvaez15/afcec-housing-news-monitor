@@ -24,6 +24,24 @@ _UNKNOWN_COLOR = {"stripe": "#B0B0B0", "bg": "#F0F0F0", "text": "#707070"}
 
 _RISK_ICON = {"Critical": "⚠", "High": "⚠", "Medium": "●", "Low": "●"}
 
+RESOURCE_LINKS = [
+    {
+        "name": "Change the Air Foundation",
+        "url": "https://changetheairfoundation.org",
+        "description": "Indoor air quality advocacy, including a dedicated mold-in-military-housing focus",
+    },
+    {
+        "name": "Project On Government Oversight (POGO)",
+        "url": "https://www.pogo.org",
+        "description": "Independent government watchdog covering defense oversight and accountability",
+    },
+    {
+        "name": "National Military Family Association",
+        "url": "https://www.militaryfamily.org",
+        "description": "Advocacy for military families, including housing and quality-of-life issues",
+    },
+]
+
 
 def risk_colors(risk_level: str | None) -> dict:
     return RISK_COLORS.get(risk_level, _UNKNOWN_COLOR)
@@ -70,45 +88,64 @@ def inject_base_styles() -> None:
     )
 
 
+# Streamlit's markdown renderer treats a blank (or whitespace-only) line inside
+# an HTML block as the end of that block, dumping any indented content that
+# follows into a literal code block instead of rendering it. Every function
+# below therefore returns HTML as a single line with no embedded newlines,
+# even where a conditional fragment might otherwise be empty.
+
+
 def render_header_html() -> str:
-    return f"""
-    <div style="background:linear-gradient(135deg,{AF_BLUE},{AF_BLUE_DARK});color:#FFFFFF;
-                padding:20px 24px;border-radius:10px;display:flex;align-items:center;gap:14px;">
-      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.14);
-                  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#127968;</div>
-      <div style="font-size:19px;font-weight:600;">{APP_TITLE}</div>
-    </div>
-    """
+    return (
+        f'<div style="background:linear-gradient(135deg,{AF_BLUE},{AF_BLUE_DARK});color:#FFFFFF;'
+        f'padding:20px 24px;border-radius:10px;display:flex;align-items:center;gap:14px;">'
+        f'<div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.14);'
+        f'display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#127968;</div>'
+        f'<div style="font-size:19px;font-weight:600;">{APP_TITLE}</div>'
+        f'</div>'
+    )
 
 
 def render_disclaimer_html() -> str:
-    return f"""
-    <div style="background:{BG};border-bottom:1px solid {SILVER};padding:8px 24px;
-                font-size:12px;color:#5F5E5A;font-style:italic;border-radius:0 0 10px 10px;">
-      {DISCLAIMER_TEXT}
-    </div>
-    """
+    return (
+        f'<div style="background:{BG};border-bottom:1px solid {SILVER};padding:8px 24px;'
+        f'font-size:12px;color:#5F5E5A;font-style:italic;border-radius:0 0 10px 10px;">'
+        f'{DISCLAIMER_TEXT}'
+        f'</div>'
+    )
 
 
 def render_metric_tile_html(label: str, count: int, risk_level: str) -> str:
     colors = risk_colors(risk_level)
-    return f"""
-    <div style="background:#FFFFFF;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);
-                display:flex;overflow:hidden;">
-      <div style="width:4px;background:{colors['stripe']};"></div>
-      <div style="padding:10px 12px;">
-        <div style="font-size:12px;color:#888780;">{label}</div>
-        <div style="font-size:22px;font-weight:600;color:#2C2C2A;">{count}</div>
-      </div>
-    </div>
-    """
+    return (
+        f'<div style="background:#FFFFFF;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);'
+        f'display:flex;overflow:hidden;">'
+        f'<div style="width:4px;background:{colors["stripe"]};"></div>'
+        f'<div style="padding:10px 12px;">'
+        f'<div style="font-size:12px;color:#888780;">{label}</div>'
+        f'<div style="font-size:22px;font-weight:600;color:#2C2C2A;">{count}</div>'
+        f'</div>'
+        f'</div>'
+    )
 
 
 def render_section_header_html(label: str) -> str:
-    return f"""
-    <div class="afhn-section-header">{label}</div>
-    <div class="afhn-section-underline"></div>
-    """
+    return (
+        f'<div class="afhn-section-header">{label}</div>'
+        f'<div class="afhn-section-underline"></div>'
+    )
+
+
+def render_resources_section_html() -> str:
+    links_html = "".join(
+        f'<div style="padding:10px 0;border-bottom:1px solid {SILVER};">'
+        f'<a href="{html.escape(link["url"], quote=True)}" '
+        f'style="font-size:14px;font-weight:600;color:{AF_BLUE};">{html.escape(link["name"])}</a>'
+        f'<div style="font-size:12px;color:#5F5E5A;margin-top:2px;">{html.escape(link["description"])}</div>'
+        f'</div>'
+        for link in RESOURCE_LINKS
+    )
+    return f'<div class="afhn-card" style="display:block;padding:14px 18px;">{links_html}</div>'
 
 
 def render_article_card_html(article: dict) -> str:
@@ -133,17 +170,17 @@ def render_article_card_html(article: dict) -> str:
         if rationale else ""
     )
 
-    return f"""
-    <div class="afhn-card">
-      <div class="afhn-card-stripe" style="background:{colors['stripe']};"></div>
-      <div class="afhn-card-body">
-        <div style="margin-bottom:4px;">
-          <span class="afhn-badge" style="background:{colors['bg']};color:{colors['text']};">{icon} {badge_label}</span>
-          <span style="font-size:14px;font-weight:600;color:#2C2C2A;">{title}</span>
-        </div>
-        {summary_html}
-        {rationale_html}
-        <div style="font-size:12px;color:#888780;">{meta} &middot; <a href="{url}" style="color:{AF_BLUE};">Read full article</a></div>
-      </div>
-    </div>
-    """
+    return (
+        f'<div class="afhn-card">'
+        f'<div class="afhn-card-stripe" style="background:{colors["stripe"]};"></div>'
+        f'<div class="afhn-card-body">'
+        f'<div style="margin-bottom:4px;">'
+        f'<span class="afhn-badge" style="background:{colors["bg"]};color:{colors["text"]};">{icon} {badge_label}</span>'
+        f'<span style="font-size:14px;font-weight:600;color:#2C2C2A;">{title}</span>'
+        f'</div>'
+        f'{summary_html}'
+        f'{rationale_html}'
+        f'<div style="font-size:12px;color:#888780;">{meta} &middot; <a href="{url}" style="color:{AF_BLUE};">Read full article</a></div>'
+        f'</div>'
+        f'</div>'
+    )

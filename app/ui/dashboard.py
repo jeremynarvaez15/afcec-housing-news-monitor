@@ -14,6 +14,7 @@ from app.ui.styles import (
     render_metric_tile_html,
     render_section_header_html,
     render_article_card_html,
+    render_resources_section_html,
 )
 
 _RISK_LEVELS = ["Critical", "High", "Medium", "Low"]
@@ -53,6 +54,11 @@ def _render_feed_section(title: str, articles: list[dict], empty_message: str) -
                 st.markdown(render_article_card_html(article), unsafe_allow_html=True)
 
 
+def _render_resources_section() -> None:
+    st.markdown(render_section_header_html("Resources"), unsafe_allow_html=True)
+    st.markdown(render_resources_section_html(), unsafe_allow_html=True)
+
+
 def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: str) -> bool:
     inject_base_styles()
     st.markdown(render_header_html(), unsafe_allow_html=True)
@@ -66,6 +72,7 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
 
     if not articles:
         st.warning("No housing-related coverage found in the last 48 hours.")
+        _render_resources_section()
         return refresh_clicked
 
     filtered = filter_by_risk_levels(articles, selected_levels)
@@ -86,5 +93,7 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
         af_feed,
         "No Air Force/Space Force-specific stories in the last 48 hours. Check back soon.",
     )
+
+    _render_resources_section()
 
     return refresh_clicked
