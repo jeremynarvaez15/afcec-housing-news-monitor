@@ -157,7 +157,7 @@ Single page, wide layout, title "Media Monitoring for Air Force Housing."
 ```
 🔴 CRITICAL  Barracks mold exposure sickens airmen at [Base]
              Investigation launched after... [2-3 sentence summary]
-             Why: health/safety hazard exposé
+             Risk Rationale: health/safety hazard exposé
              Stars and Stripes · 3h ago · [Read Full Article →]
 ```
 - Max 20 shown by default, rest in an expander (same pattern as existing digest)

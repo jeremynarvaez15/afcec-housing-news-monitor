@@ -202,7 +202,7 @@ def render_article_card_html(article: dict) -> str:
         if summary else ""
     )
     rationale_html = (
-        f'<div style="font-size:12px;color:#888780;margin-bottom:4px;">Why: {rationale}</div>'
+        f'<div style="font-size:12px;color:#888780;margin-bottom:4px;">Risk Rationale: {rationale}</div>'
         if rationale else ""
     )
 
