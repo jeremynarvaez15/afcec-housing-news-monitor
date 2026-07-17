@@ -10,7 +10,7 @@ BG = "#F5F6F8"
 
 APP_TITLE = "Media Monitoring for Air Force Housing"
 DISCLAIMER_TEXT = (
-    "This is an unofficial personal risk management tool, "
+    "This is an unofficial personal tool for media monitoring and risk management, "
     "not an official Department of the Air Force system."
 )
 
