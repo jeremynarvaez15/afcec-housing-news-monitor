@@ -1,5 +1,7 @@
+import base64
 import html
 from datetime import datetime, timezone
+from pathlib import Path
 
 import streamlit as st
 
@@ -8,6 +10,17 @@ PRIMARY_COLOR = "#E30613"
 SECONDARY_COLOR = "#000000"
 SILVER = "#C0C0C0"
 BG = "#F5F6F8"
+
+_LOGO_PATH = Path(__file__).parent / "assets" / "jll_logo.png"
+_logo_data_uri_cache: str | None = None
+
+
+def _logo_data_uri() -> str:
+    global _logo_data_uri_cache
+    if _logo_data_uri_cache is None:
+        encoded = base64.b64encode(_LOGO_PATH.read_bytes()).decode("ascii")
+        _logo_data_uri_cache = f"data:image/png;base64,{encoded}"
+    return _logo_data_uri_cache
 
 APP_TITLE = "Media Monitoring for Air Force Housing"
 DISCLAIMER_TEXT = (
@@ -126,10 +139,9 @@ def inject_base_styles() -> None:
 
 def render_header_html() -> str:
     return (
-        f'<div style="background:linear-gradient(135deg,{PRIMARY_COLOR},{SECONDARY_COLOR});color:#FFFFFF;'
-        f'padding:20px 24px;border-radius:10px;display:flex;align-items:center;gap:14px;">'
-        f'<div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.14);'
-        f'display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#127968;</div>'
+        f'<div style="background:{SECONDARY_COLOR};color:#FFFFFF;'
+        f'padding:16px 24px;border-radius:10px;display:flex;align-items:center;gap:16px;">'
+        f'<img src="{_logo_data_uri()}" alt="JLL" style="height:38px;width:auto;display:block;flex-shrink:0;">'
         f'<div style="font-size:19px;font-weight:600;">{APP_TITLE}</div>'
         f'</div>'
     )

@@ -18,10 +18,23 @@ def test_how_to_use_text_covers_risk_levels_and_filters():
         assert term in styles.HOW_TO_USE_TEXT
 
 
-def test_render_header_html_contains_title_and_color():
+def test_render_header_html_contains_title_and_logo():
     html = styles.render_header_html()
     assert styles.APP_TITLE in html
-    assert styles.PRIMARY_COLOR in html
+    assert styles.SECONDARY_COLOR in html
+    assert "data:image/png;base64," in html
+
+
+def test_logo_data_uri_is_cached_and_valid_base64():
+    import base64
+
+    uri = styles._logo_data_uri()
+    assert uri.startswith("data:image/png;base64,")
+    encoded = uri.split(",", 1)[1]
+    # Should decode without error and match the actual file on disk.
+    decoded = base64.b64decode(encoded)
+    assert decoded == styles._LOGO_PATH.read_bytes()
+    assert styles._logo_data_uri() is uri  # second call returns the cached string
 
 
 def test_render_resources_section_html_lists_all_orgs():
