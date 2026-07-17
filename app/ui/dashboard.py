@@ -60,7 +60,25 @@ def _render_resources_section() -> None:
     st.markdown(render_resources_section_html(), unsafe_allow_html=True)
 
 
-def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: str) -> bool:
+def _render_feed_diagnostics(feed_diagnostics: list[dict]) -> None:
+    with st.expander("Feed status (troubleshooting)"):
+        st.caption(
+            "Per-feed fetch results, independent of keyword matching — helps tell "
+            "'nothing published' apart from 'a feed failed to load.'"
+        )
+        for d in feed_diagnostics:
+            if d["error"]:
+                st.write(f"⚠️ **{d['source']}** — {d['entry_count']} entries — error: {d['error']}")
+            else:
+                st.write(f"✅ **{d['source']}** — {d['entry_count']} entries")
+
+
+def render_dashboard(
+    articles: list[dict],
+    key_missing: bool,
+    last_refreshed: str,
+    feed_diagnostics: list[dict] | None = None,
+) -> bool:
     inject_base_styles()
     st.markdown(render_header_html(), unsafe_allow_html=True)
     st.markdown(render_disclaimer_html(), unsafe_allow_html=True)
@@ -76,6 +94,8 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
 
     if not articles:
         st.warning("No housing-related coverage found in the last week.")
+        if feed_diagnostics:
+            _render_feed_diagnostics(feed_diagnostics)
         _render_resources_section()
         return refresh_clicked
 

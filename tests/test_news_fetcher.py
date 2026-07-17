@@ -2,7 +2,13 @@ from types import SimpleNamespace
 from datetime import datetime, timezone, timedelta
 
 import app.data.news_fetcher as news_fetcher
-from app.data.news_fetcher import fetch_housing_articles, _matches_keywords, _name_matches
+from app.data.news_fetcher import (
+    fetch_housing_articles,
+    fetch_feed_diagnostics,
+    _matches_keywords,
+    _name_matches,
+    _FEEDS,
+)
 
 
 def _struct_time(hours_ago):
@@ -86,3 +92,45 @@ def test_fetch_housing_articles_skips_feed_that_raises(monkeypatch):
     articles = fetch_housing_articles()
 
     assert articles == []
+
+
+def test_fetch_feed_diagnostics_reports_entry_count_per_feed(monkeypatch):
+    entries = [_entry(title="Some story", summary="", link="http://x", hours_ago=1)]
+    fake_parsed = SimpleNamespace(entries=entries, bozo=False, bozo_exception=None, status=200)
+    monkeypatch.setattr(news_fetcher.feedparser, "parse", lambda url: fake_parsed)
+
+    diagnostics = fetch_feed_diagnostics()
+
+    assert len(diagnostics) == len(_FEEDS)
+    for d in diagnostics:
+        assert d["entry_count"] == 1
+        assert d["error"] is None
+        assert d["http_status"] == 200
+
+
+def test_fetch_feed_diagnostics_reports_error_when_parse_raises(monkeypatch):
+    def _raise(url):
+        raise ConnectionError("feed unavailable")
+
+    monkeypatch.setattr(news_fetcher.feedparser, "parse", _raise)
+
+    diagnostics = fetch_feed_diagnostics()
+
+    assert len(diagnostics) == len(_FEEDS)
+    for d in diagnostics:
+        assert d["entry_count"] == 0
+        assert "feed unavailable" in d["error"]
+
+
+def test_fetch_feed_diagnostics_reports_bozo_parse_errors(monkeypatch):
+    fake_parsed = SimpleNamespace(
+        entries=[], bozo=True, bozo_exception=ValueError("malformed xml"), status=200
+    )
+    monkeypatch.setattr(news_fetcher.feedparser, "parse", lambda url: fake_parsed)
+
+    diagnostics = fetch_feed_diagnostics()
+
+    assert len(diagnostics) == len(_FEEDS)
+    for d in diagnostics:
+        assert d["entry_count"] == 0
+        assert "malformed xml" in d["error"]

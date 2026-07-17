@@ -2,7 +2,7 @@ import time
 
 import streamlit as st
 
-from app.data.news_fetcher import fetch_housing_articles
+from app.data.news_fetcher import fetch_housing_articles, fetch_feed_diagnostics
 from app.data.risk_assessor import assess_risk
 from app.ui.dashboard import render_dashboard
 
@@ -39,9 +39,18 @@ cache_buster = int(time.time() // _REFRESH_INTERVAL)
 with st.spinner("Loading housing news coverage..."):
     articles = load_housing_news(cache_buster)
 
+feed_diagnostics = None
+if not articles:
+    # Only re-fetch for diagnostics when there's actually nothing to show —
+    # this is troubleshooting info, not part of the normal render path.
+    feed_diagnostics = fetch_feed_diagnostics()
+
 last_refreshed = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())
 refresh_clicked = render_dashboard(
-    articles, key_missing=(not anthropic_key), last_refreshed=last_refreshed
+    articles,
+    key_missing=(not anthropic_key),
+    last_refreshed=last_refreshed,
+    feed_diagnostics=feed_diagnostics,
 )
 
 if refresh_clicked:

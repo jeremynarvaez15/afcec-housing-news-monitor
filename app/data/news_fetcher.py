@@ -115,6 +115,35 @@ def _fetch_feed(feed_cfg: dict) -> list[dict]:
         return []
 
 
+def fetch_feed_diagnostics() -> list[dict]:
+    """Per-feed fetch status for troubleshooting (entry counts, HTTP status,
+    parse errors) independent of keyword/recency filtering. Not used on the
+    normal render path — call this only when investigating why a feed isn't
+    contributing articles, since it re-fetches every feed."""
+    diagnostics = []
+    for feed in _FEEDS:
+        try:
+            parsed = feedparser.parse(feed["url"])
+            bozo = bool(getattr(parsed, "bozo", False))
+            bozo_exception = getattr(parsed, "bozo_exception", None)
+            diagnostics.append({
+                "source": feed["source"],
+                "url": feed["url"],
+                "entry_count": len(parsed.entries),
+                "http_status": getattr(parsed, "status", None),
+                "error": str(bozo_exception) if bozo and bozo_exception else None,
+            })
+        except Exception as e:
+            diagnostics.append({
+                "source": feed["source"],
+                "url": feed["url"],
+                "entry_count": 0,
+                "http_status": None,
+                "error": str(e),
+            })
+    return diagnostics
+
+
 def fetch_housing_articles() -> list[dict]:
     articles = []
     for feed in _FEEDS:
