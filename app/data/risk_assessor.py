@@ -71,7 +71,15 @@ def _assess_one(client, article: dict) -> dict:
             messages=[{"role": "user", "content": prompt}],
         )
         text = _extract_text(message)
-        parsed = json.loads(_extract_json_object(text))
+        json_slice = _extract_json_object(text)
+        try:
+            parsed = json.loads(json_slice)
+        except json.JSONDecodeError as e:
+            # Surface exactly what Claude sent back (truncated) instead of a bare
+            # JSONDecodeError — that message is identical for "empty string" and
+            # "non-empty text with no recognizable JSON," which made this
+            # failure mode impossible to diagnose from the error alone.
+            raise ValueError(f"Could not parse JSON from Claude's response: {text[:300]!r}") from e
         risk_level = str(parsed.get("risk_level", ""))
         if risk_level not in _VALID_LEVELS:
             risk_level = None

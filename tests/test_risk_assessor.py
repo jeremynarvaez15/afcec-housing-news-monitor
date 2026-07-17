@@ -81,6 +81,19 @@ def test_assess_risk_invalid_json_falls_back(monkeypatch):
     assert result[0]["summary"] == ""
 
 
+def test_assess_risk_unparseable_response_surfaces_raw_text_in_error(monkeypatch):
+    # Prose with no "{" at all (e.g. a refusal/hedge instead of JSON) can't be
+    # rescued by _extract_json_object — the risk_error must show what Claude
+    # actually said instead of a bare, unhelpful JSONDecodeError.
+    _patch_anthropic(monkeypatch, "I'm unable to assess this without more context.")
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] is None
+    assert "unable to assess this without more context" in result[0]["risk_error"]
+
+
 def test_assess_risk_unrecognized_risk_level_becomes_none(monkeypatch):
     _patch_anthropic(monkeypatch, _response_json(risk_level="Severe"))
     articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
