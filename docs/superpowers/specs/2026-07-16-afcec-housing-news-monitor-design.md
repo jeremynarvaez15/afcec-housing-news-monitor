@@ -165,7 +165,7 @@ Single page, wide layout, title "Media Monitoring for Air Force Housing."
 
 ### Section 2: ✈️ Air Force / Space Force Specific
 - Same card format, filtered to `af_specific=true` (in addition to sidebar filters)
-- Empty state: "No Air Force/Space Force-specific stories in the last hour. Check back soon."
+- Empty state: "No Air Force/Space Force-specific stories in the last 48 hours. Check back soon."
 
 ---
 
