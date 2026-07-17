@@ -84,7 +84,7 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
     _render_feed_section(
         "Air Force / Space Force Specific",
         af_feed,
-        "No Air Force/Space Force-specific stories in the last hour. Check back soon.",
+        "No Air Force/Space Force-specific stories in the last 48 hours. Check back soon.",
     )
 
     return refresh_clicked

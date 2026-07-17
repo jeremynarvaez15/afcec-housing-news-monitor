@@ -31,7 +31,7 @@ _FALLBACK = {
 
 def _assess_one(client, article: dict) -> dict:
     content = (article.get("description") or "")[:500]
-    prompt = _PROMPT.format(title=article["title"], content=content)
+    prompt = _PROMPT.format(title=article.get("title", ""), content=content)
     try:
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",

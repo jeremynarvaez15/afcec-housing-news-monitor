@@ -71,6 +71,21 @@ def test_render_article_card_html_handles_missing_risk_level():
     assert styles._UNKNOWN_COLOR["stripe"] in html
 
 
+def test_render_article_card_html_escapes_script_tag_in_title():
+    article = {
+        "title": "Breaking <script>alert(1)</script> news",
+        "summary": "",
+        "risk_level": "Critical",
+        "risk_rationale": "",
+        "source": "Example News",
+        "url": "http://example.com/c",
+        "published_at": "",
+    }
+    html_output = styles.render_article_card_html(article)
+    assert "<script>" not in html_output
+    assert "&lt;script&gt;" in html_output
+
+
 def test_time_ago_hours():
     published = (datetime.now(timezone.utc) - timedelta(hours=3)).isoformat()
     assert styles.time_ago(published) == "3h ago"

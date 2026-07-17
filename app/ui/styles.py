@@ -1,3 +1,4 @@
+import html
 from datetime import datetime, timezone
 
 import streamlit as st
@@ -115,11 +116,11 @@ def render_article_card_html(article: dict) -> str:
     colors = risk_colors(risk_level)
     badge_label = risk_level or "Unrated"
     icon = _RISK_ICON.get(risk_level, "?")
-    title = article.get("title", "")
-    summary = article.get("summary") or ""
-    rationale = article.get("risk_rationale") or ""
-    source = article.get("source", "")
-    url = article.get("url", "#")
+    title = html.escape(article.get("title", ""))
+    summary = html.escape(article.get("summary") or "")
+    rationale = html.escape(article.get("risk_rationale") or "")
+    source = html.escape(article.get("source", ""))
+    url = html.escape(article.get("url", "#"), quote=True)
     ago = time_ago(article.get("published_at", ""))
     meta = " &middot; ".join(filter(None, [source, ago]))
 
