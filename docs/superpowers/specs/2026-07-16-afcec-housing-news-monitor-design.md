@@ -115,29 +115,54 @@ Return ONLY valid JSON with these exact keys:
 
 ---
 
-## Page Layout
+## Visual Design & Branding
 
-Single page, title "AFCEC Military Housing News Monitor."
+Goal: read as a credible, professional monitoring tool a client and team will trust — not a default-styled Streamlit demo.
 
-**Disclaimer banner** at top (shared with colleagues):
+**Color palette (Air Force blue & silver):**
+- Primary/header: deep Air Force blue `#00308F`
+- Accent/dividers: silver/light-gray `#C0C0C0`
+- Background: white / very light gray `#F5F6F8`
+- Risk colors layered on top of the neutral palette: Critical `#C0392B` (red), High `#E67E22` (orange), Medium `#D4AC0D` (yellow/gold), Low `#7F8C8D` (gray)
+- No official DoD/Air Force insignia or seals are used (avoids implying official endorsement) — branding is color/typography only
+
+**Implementation approach:** `st.set_page_config` with a wide layout, a `.streamlit/config.toml` `[theme]` block setting the base palette, plus targeted custom CSS injected via `st.markdown(..., unsafe_allow_html=True)` for card styling, pill-shaped risk badges, and the header bar. Kept in a single `app/ui/styles.py` module so styling stays out of layout logic.
+
+**Header bar:** full-width band in Air Force blue with white text — app title "AFCEC Military Housing News Monitor" and a one-line tagline ("Media monitoring for MHPI, privatized housing, dorms & barracks"). Disclaimer banner sits directly below it, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
 > "Unofficial personal tool for situational awareness — not an official AFCEC/Air Force system. AI-generated risk levels require human judgment before acting."
 
-**Summary row:** counts of today's articles by level, e.g. `🔴 2 Critical · 🟠 5 High · 🟡 8 Medium · ⚪ 12 Low`
+**Article cards:** white background, subtle shadow, thin left border colored by risk level (a common "status stripe" pattern), rounded corners. Risk level shown as a pill-shaped badge (colored background, white text) rather than the plain-text `[score]` badges from the original digest. Source and timestamp in muted gray, headline bold, "Read Full Article" as a styled link/button.
+
+**Summary row:** rendered as four metric tiles (`st.metric` or custom CSS tiles) side by side rather than a single caption line — each tile shows the count and risk color as an accent bar.
+
+## Page Layout
+
+Single page, wide layout, title "AFCEC Military Housing News Monitor."
+
+**Header bar + disclaimer banner** as described above.
+
+**Sidebar filters:**
+- Risk level multi-select (Critical/High/Medium/Low, all checked by default)
+- "Air Force/Space Force specific only" toggle
+- Keyword search box (client-side filter on title/summary text of already-fetched articles)
+- Sidebar also shows last-refreshed timestamp and a manual "Refresh now" button (bypasses cache)
+
+**Summary row:** four metric tiles, e.g. `🔴 2 Critical · 🟠 5 High · 🟡 8 Medium · ⚪ 12 Low` (reflects post-filter counts)
 
 ### Section 1: 🏠 Housing Coverage Feed
-- All articles, sorted Critical → High → Medium → Low
-- Card format:
+- All articles passing the current sidebar filters, sorted Critical → High → Medium → Low
+- Card format (styled per Visual Design above):
 ```
 🔴 CRITICAL  Barracks mold exposure sickens airmen at [Base]
              Investigation launched after... [2-3 sentence summary]
              Why: health/safety hazard exposé
              Stars and Stripes · 3h ago · [Read Full Article →]
 ```
-- Risk badge colors: Critical red, High orange, Medium yellow, Low gray
 - Max 20 shown by default, rest in an expander (same pattern as existing digest)
+- Empty state (no articles match filters): "No articles match the current filters."
 
 ### Section 2: ✈️ Air Force / Space Force Specific
-- Same card format, filtered to `af_specific=true`
+- Same card format, filtered to `af_specific=true` (in addition to sidebar filters)
 - Empty state: "No Air Force/Space Force-specific stories in the last hour. Check back soon."
 
 ---
@@ -169,8 +194,10 @@ afcec-housing-news-monitor/
 │   │   ├── news_fetcher.py        # RSS feed list, fetch, keyword filter, 48h recency
 │   │   └── risk_assessor.py       # Anthropic API risk classification + JSON parsing
 │   └── ui/
-│       └── dashboard.py           # Summary row, main feed, AF-specific feed
+│       ├── dashboard.py           # Header, sidebar filters, summary row, main feed, AF-specific feed
+│       └── styles.py              # Theme colors, custom CSS (cards, badges, header bar)
 ├── .streamlit/
+│   ├── config.toml                # Base Streamlit theme (Air Force blue/silver palette)
 │   └── secrets.toml.example       # Documents required ANTHROPIC_API_KEY (not committed)
 ├── requirements.txt                # streamlit, feedparser, anthropic
 └── README.md
