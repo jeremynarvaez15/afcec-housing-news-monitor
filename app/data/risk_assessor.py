@@ -49,8 +49,11 @@ def _assess_one(client, article: dict) -> dict:
             "risk_rationale": str(parsed.get("risk_rationale", "")),
             "af_specific": bool(parsed.get("af_specific", False)),
         }
-    except Exception:
-        return dict(_FALLBACK)
+    except Exception as e:
+        # risk_error is diagnostic-only (surfaced in a troubleshooting expander
+        # when the dashboard notices articles coming back unrated with a key
+        # present) — never assert on its exact wording, only that it exists.
+        return {**_FALLBACK, "risk_error": f"{type(e).__name__}: {e}"}
 
 
 def assess_risk(articles: list[dict], api_key: str) -> list[dict]:
@@ -61,8 +64,9 @@ def assess_risk(articles: list[dict], api_key: str) -> list[dict]:
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=api_key)
-    except Exception:
-        return [{**a, **_FALLBACK} for a in articles]
+    except Exception as e:
+        error = f"{type(e).__name__}: {e}"
+        return [{**a, **_FALLBACK, "risk_error": error} for a in articles]
 
     result = []
     for article in articles:

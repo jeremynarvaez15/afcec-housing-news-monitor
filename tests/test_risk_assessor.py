@@ -85,3 +85,32 @@ def test_assess_risk_unrecognized_risk_level_becomes_none(monkeypatch):
 
 def test_assess_risk_empty_articles_returns_empty_list():
     assert assess_risk([], api_key="fake-key") == []
+
+
+class _RaisingMessages:
+    def create(self, **kwargs):
+        raise RuntimeError("AuthenticationError: invalid x-api-key")
+
+
+class _RaisingClient:
+    def __init__(self):
+        self.messages = _RaisingMessages()
+
+
+def test_assess_risk_captures_api_call_error_for_diagnostics(monkeypatch):
+    import anthropic
+    monkeypatch.setattr(anthropic, "Anthropic", lambda api_key: _RaisingClient())
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] is None
+    assert "AuthenticationError" in result[0]["risk_error"]
+
+
+def test_assess_risk_no_api_key_has_no_risk_error():
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="")
+
+    assert result[0].get("risk_error") is None

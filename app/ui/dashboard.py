@@ -73,6 +73,27 @@ def _render_feed_diagnostics(feed_diagnostics: list[dict]) -> None:
                 st.write(f"✅ **{d['source']}** — {d['entry_count']} entries")
 
 
+def _render_risk_diagnostics(articles: list[dict]) -> None:
+    errors = [a["risk_error"] for a in articles if a.get("risk_error")]
+    if not errors:
+        return
+    # Group by exception type (text before the first ": ") since each call gets
+    # a unique request_id, which would otherwise defeat deduping entirely.
+    by_type: dict[str, tuple[int, str]] = {}
+    for err in errors:
+        error_type = err.split(": ", 1)[0]
+        count, _ = by_type.get(error_type, (0, err))
+        by_type[error_type] = (count + 1, err)
+
+    with st.expander("Risk assessment status (troubleshooting)", expanded=True):
+        st.caption(
+            f"{len(errors)} of {len(articles)} articles came back unrated because "
+            "the AI risk call failed. Distinct errors seen:"
+        )
+        for error_type, (count, example) in sorted(by_type.items()):
+            st.write(f"⚠️ **{error_type}** ({count}x) — {example}")
+
+
 def render_dashboard(
     articles: list[dict],
     key_missing: bool,
@@ -98,6 +119,8 @@ def render_dashboard(
             _render_feed_diagnostics(feed_diagnostics)
         _render_resources_section()
         return refresh_clicked
+
+    _render_risk_diagnostics(articles)
 
     filtered = filter_by_risk_levels(articles, selected_levels)
     filtered = filter_by_keyword(filtered, query)
