@@ -75,7 +75,7 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
     st.sidebar.caption(f"Last refreshed: {last_refreshed}")
 
     if not articles:
-        st.warning("No housing-related coverage found in the last 48 hours.")
+        st.warning("No housing-related coverage found in the last week.")
         _render_resources_section()
         return refresh_clicked
 
@@ -95,7 +95,7 @@ def render_dashboard(articles: list[dict], key_missing: bool, last_refreshed: st
     _render_feed_section(
         "Air Force / Space Force Specific",
         af_feed,
-        "No Air Force/Space Force-specific stories in the last 48 hours. Check back soon.",
+        "No Air Force/Space Force-specific stories in the last week. Check back soon.",
     )
 
     _render_resources_section()

@@ -44,8 +44,8 @@ pytest
 ## How it works
 
 - `app/data/news_fetcher.py` — pulls RSS from military/defense trade press plus BBC
-  and NPR, keeps only articles matching housing keywords or known MHPI partner
-  company names, drops anything older than 48 hours.
+  and NPR, keeps only articles matching housing keywords, known MHPI partner company
+  names, or resident-advocacy/watchdog org names, drops anything older than 1 week.
 - `app/data/risk_assessor.py` — sends each article to Claude
   (`claude-haiku-4-5-20251001`) for a summary + risk classification.
 - `app/data/filters.py` — pure filter/sort/count helpers used by the sidebar.

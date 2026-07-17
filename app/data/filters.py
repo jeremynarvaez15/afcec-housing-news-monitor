@@ -2,7 +2,10 @@ _RISK_ORDER = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
 
 
 def filter_by_risk_levels(articles: list[dict], levels: set[str]) -> list[dict]:
-    return [a for a in articles if a.get("risk_level") in levels]
+    # An article with risk_level=None has no assessed level to filter by
+    # (missing API key, or a failed AI call) — always keep it rather than
+    # silently dropping content the sidebar's checkboxes can't represent.
+    return [a for a in articles if a.get("risk_level") is None or a.get("risk_level") in levels]
 
 
 def filter_af_specific(articles: list[dict]) -> list[dict]:

@@ -26,6 +26,16 @@ def test_filter_by_risk_levels_keeps_only_selected_levels():
     assert result[0]["risk_level"] == "Critical"
 
 
+def test_filter_by_risk_levels_always_keeps_unrated_articles():
+    # An article with risk_level=None (missing API key, or a failed AI call)
+    # has no level to filter by, so it must never be silently dropped just
+    # because the sidebar's Critical/High/Medium/Low checkboxes don't list "None".
+    articles = [_article(risk_level=None), _article(risk_level="Low")]
+    result = filter_by_risk_levels(articles, {"Critical"})
+    assert len(result) == 1
+    assert result[0]["risk_level"] is None
+
+
 def test_filter_af_specific_keeps_only_af_specific_true():
     articles = [_article(af_specific=True), _article(af_specific=False)]
     result = filter_af_specific(articles)

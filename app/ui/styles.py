@@ -26,8 +26,10 @@ _RISK_ICON = {"Critical": "⚠", "High": "⚠", "Medium": "●", "Low": "●"}
 
 HOW_TO_USE_TEXT = """\
 **What this is:** This tool scans military/defense and general news for coverage of \
-MHPI, privatized housing, dorms, barracks, and DoD-owned housing, summarizes each \
-article with AI, and flags its reputational/operational risk to the Air Force.
+MHPI, privatized housing, dorms, barracks, and DoD-owned housing from the last week, \
+summarizes each article with AI, and flags its reputational/operational risk to the \
+Air Force. Housing-specific coverage is infrequent — expect a quiet week to mean \
+little happened, not that the tool is broken.
 
 **Risk levels:**
 - 🔴 **Critical** — safety incidents, deaths, criminal charges, active investigations

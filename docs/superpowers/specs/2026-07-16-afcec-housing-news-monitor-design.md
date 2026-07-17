@@ -15,7 +15,7 @@ A standalone Streamlit app that monitors media coverage of military housing prog
 - New standalone repo and Streamlit Cloud deployment (not a tab in the existing swing-scanner app)
 - Keyword-based monitoring only — no dedicated per-company sections
 - Refreshes every 60 minutes (cached to control API costs)
-- Articles retained for 48 hours from publish time, then drop out of the feed
+- Articles retained for 1 week (168 hours) from publish time, then drop out of the feed. (Originally 48 hours; widened after live verification showed housing-specific coverage is infrequent enough that a 48-hour window regularly missed real stories that were only 1-3 hours past the cutoff.)
 - Requires one API key: `ANTHROPIC_API_KEY` (user already has one)
 - No database — live snapshot only, backed by RSS recency filtering
 
@@ -165,7 +165,7 @@ Single page, wide layout, title "Media Monitoring for Air Force Housing."
 
 ### Section 2: ✈️ Air Force / Space Force Specific
 - Same card format, filtered to `af_specific=true` (in addition to sidebar filters)
-- Empty state: "No Air Force/Space Force-specific stories in the last 48 hours. Check back soon."
+- Empty state: "No Air Force/Space Force-specific stories in the last week. Check back soon."
 
 ---
 
@@ -174,7 +174,7 @@ Single page, wide layout, title "Media Monitoring for Air Force Housing."
 ```
 load_housing_news(cache_buster)          # @st.cache_data ttl=3600
   ├── fetch_housing_articles()           # RSS: military/defense + general feeds,
-  │                                       #   filtered to housing keywords, 48h recency window
+  │                                       #   filtered to housing keywords, 1-week recency window
   └── assess_risk(articles)              # Anthropic API: per-article risk classification
         └── returns list[AssessedArticle]
 
@@ -193,7 +193,7 @@ afcec-housing-news-monitor/
 ├── main.py                        # Streamlit entry point
 ├── app/
 │   ├── data/
-│   │   ├── news_fetcher.py        # RSS feed list, fetch, keyword filter, 48h recency
+│   │   ├── news_fetcher.py        # RSS feed list, fetch, keyword filter, 1-week recency
 │   │   └── risk_assessor.py       # Anthropic API risk classification + JSON parsing
 │   └── ui/
 │       ├── dashboard.py           # Header, sidebar filters, summary row, main feed, AF-specific feed
@@ -212,7 +212,7 @@ afcec-housing-news-monitor/
 - If an individual RSS feed fails to fetch/parse: skip that feed silently, continue with the rest
 - If Anthropic API key missing: show informational message "Add ANTHROPIC_API_KEY to your secrets to enable risk assessment"
 - If Anthropic API call fails for an article: show raw headline + snippet without AI summary/risk level; do not crash
-- If zero articles match keywords in the current window: show "No housing-related coverage found in the last 48 hours."
+- If zero articles match keywords in the current window: show "No housing-related coverage found in the last week."
 
 ---
 
