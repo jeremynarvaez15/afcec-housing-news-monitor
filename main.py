@@ -2,7 +2,7 @@ import time
 
 import streamlit as st
 
-from app.data.news_fetcher import fetch_housing_articles, fetch_feed_diagnostics
+from app.data.news_fetcher import fetch_housing_articles, fetch_feed_diagnostics, get_source_names
 from app.data.risk_assessor import assess_risk
 from app.ui.dashboard import render_dashboard
 
@@ -50,6 +50,7 @@ refresh_clicked = render_dashboard(
     articles,
     key_missing=(not anthropic_key),
     last_refreshed=last_refreshed,
+    source_names=get_source_names(),
     feed_diagnostics=feed_diagnostics,
 )
 

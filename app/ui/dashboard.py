@@ -55,9 +55,9 @@ def _render_feed_section(title: str, articles: list[dict], empty_message: str) -
                 st.markdown(render_article_card_html(article), unsafe_allow_html=True)
 
 
-def _render_resources_section() -> None:
-    st.markdown(render_section_header_html("Resources"), unsafe_allow_html=True)
-    st.markdown(render_resources_section_html(), unsafe_allow_html=True)
+def _render_resources_section(source_names: list[str]) -> None:
+    with st.expander("Resources"):
+        st.markdown(render_resources_section_html(source_names), unsafe_allow_html=True)
 
 
 def _render_feed_diagnostics(feed_diagnostics: list[dict]) -> None:
@@ -98,6 +98,7 @@ def render_dashboard(
     articles: list[dict],
     key_missing: bool,
     last_refreshed: str,
+    source_names: list[str],
     feed_diagnostics: list[dict] | None = None,
 ) -> bool:
     inject_base_styles()
@@ -117,17 +118,20 @@ def render_dashboard(
         st.warning("No housing-related coverage found in the last week.")
         if feed_diagnostics:
             _render_feed_diagnostics(feed_diagnostics)
-        _render_resources_section()
+        _render_resources_section(source_names)
         return refresh_clicked
 
     _render_risk_diagnostics(articles)
+
+    # Summary tiles always reflect everything fetched, not the current sidebar
+    # filter selection — a stable overview, independent of what the feed below
+    # is currently narrowed to.
+    _render_summary_row(articles)
 
     filtered = filter_by_risk_levels(articles, selected_levels)
     filtered = filter_by_keyword(filtered, query)
     if af_only:
         filtered = filter_af_specific(filtered)
-
-    _render_summary_row(filtered)
 
     main_feed = sort_by_risk(filtered)
     _render_feed_section(
@@ -141,6 +145,6 @@ def render_dashboard(
         "No Air Force/Space Force-specific stories in the last week. Check back soon.",
     )
 
-    _render_resources_section()
+    _render_resources_section(source_names)
 
     return refresh_clicked

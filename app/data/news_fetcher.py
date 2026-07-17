@@ -144,6 +144,19 @@ def fetch_feed_diagnostics() -> list[dict]:
     return diagnostics
 
 
+def get_source_names() -> list[str]:
+    """Unique source names monitored, in first-appearance order (some sources,
+    like Stars and Stripes, have more than one feed URL in _FEEDS)."""
+    seen = set()
+    names = []
+    for feed in _FEEDS:
+        name = feed["source"]
+        if name not in seen:
+            seen.add(name)
+            names.append(name)
+    return names
+
+
 def fetch_housing_articles() -> list[dict]:
     articles = []
     for feed in _FEEDS:

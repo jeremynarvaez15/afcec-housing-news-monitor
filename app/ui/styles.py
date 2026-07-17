@@ -44,8 +44,9 @@ little happened, not that the tool is broken.
 - Click "Refresh now" to check for new articles immediately — otherwise the feed \
 refreshes automatically about once an hour
 
-**Resources:** Links at the bottom of the page point to independent advocacy and \
-watchdog organizations for further reading.
+**Resources:** The collapsible Resources section lists every news source this tool \
+monitors, plus links to independent advocacy and watchdog organizations for further \
+reading.
 
 **A note on AI risk levels:** These are AI-generated starting points, not official \
 determinations — always apply your own judgment before acting on them.
@@ -163,7 +164,8 @@ def render_section_header_html(label: str) -> str:
     )
 
 
-def render_resources_section_html() -> str:
+def render_resources_section_html(source_names: list[str]) -> str:
+    sources_html = ", ".join(html.escape(name) for name in source_names)
     links_html = "".join(
         f'<div style="padding:10px 0;border-bottom:1px solid {SILVER};">'
         f'<a href="{html.escape(link["url"], quote=True)}" '
@@ -172,7 +174,14 @@ def render_resources_section_html() -> str:
         f'</div>'
         for link in RESOURCE_LINKS
     )
-    return f'<div class="afhn-card" style="display:block;padding:14px 18px;">{links_html}</div>'
+    return (
+        f'<div class="afhn-card" style="display:block;padding:14px 18px;">'
+        f'<div style="font-size:13px;font-weight:600;color:#2C2C2A;margin-bottom:6px;">News sources monitored</div>'
+        f'<div style="font-size:12px;color:#5F5E5A;padding-bottom:12px;border-bottom:1px solid {SILVER};">{sources_html}</div>'
+        f'<div style="font-size:13px;font-weight:600;color:#2C2C2A;margin-top:12px;">Advocacy &amp; watchdog organizations</div>'
+        f'{links_html}'
+        f'</div>'
+    )
 
 
 def render_article_card_html(article: dict) -> str:

@@ -25,18 +25,26 @@ def test_render_header_html_contains_title_and_color():
 
 
 def test_render_resources_section_html_lists_all_orgs():
-    html = styles.render_resources_section_html()
+    html = styles.render_resources_section_html(["Military.com", "AF.mil"])
     for link in styles.RESOURCE_LINKS:
         assert link["name"] in html
         assert link["url"] in html
         assert link["description"] in html
 
 
+def test_render_resources_section_html_lists_source_names():
+    html = styles.render_resources_section_html(["Military.com", "Stars and Stripes", "AF.mil"])
+    assert "Military.com" in html
+    assert "Stars and Stripes" in html
+    assert "AF.mil" in html
+    assert "News sources monitored" in html
+
+
 def test_render_resources_section_html_has_no_embedded_newlines():
     # A blank/whitespace-only line inside an st.markdown(unsafe_allow_html=True)
     # call makes Streamlit render everything after it as a literal code block
     # instead of HTML. Guard against that regressing.
-    assert "\n" not in styles.render_resources_section_html()
+    assert "\n" not in styles.render_resources_section_html(["Military.com"])
 
 
 def test_render_article_card_html_has_no_embedded_newlines_with_empty_summary_and_rationale():

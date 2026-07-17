@@ -5,6 +5,7 @@ import app.data.news_fetcher as news_fetcher
 from app.data.news_fetcher import (
     fetch_housing_articles,
     fetch_feed_diagnostics,
+    get_source_names,
     _matches_keywords,
     _name_matches,
     _FEEDS,
@@ -134,3 +135,17 @@ def test_fetch_feed_diagnostics_reports_bozo_parse_errors(monkeypatch):
     for d in diagnostics:
         assert d["entry_count"] == 0
         assert "malformed xml" in d["error"]
+
+
+def test_get_source_names_returns_unique_names_in_feed_order():
+    names = get_source_names()
+
+    # Stars and Stripes has two feed entries in _FEEDS; the display list must
+    # not show it twice.
+    assert names.count("Stars and Stripes") == 1
+    assert len(names) == len(set(names))
+    assert "Military.com" in names
+    assert "AF.mil" in names
+    # Order should match first appearance in _FEEDS, not be alphabetized —
+    # keeps it stable and predictable rather than surprising on re-sort.
+    assert names[0] == "Military.com"
