@@ -119,23 +119,24 @@ Return ONLY valid JSON with these exact keys:
 
 Goal: read as a credible, professional monitoring tool a client and team will trust — not a default-styled Streamlit demo.
 
-**Color palette (Air Force blue & silver):**
-- Primary/header: deep Air Force blue `#00308F`
+**Color palette (JLL brand — Rainbow Red & black):**
+- Primary/header: JLL Rainbow Red `#E30613`
+- Secondary/header gradient: JLL black `#000000`
 - Accent/dividers: silver/light-gray `#C0C0C0`
 - Background: white / very light gray `#F5F6F8`
 - Risk colors layered on top of the neutral palette: Critical `#C0392B` (red), High `#E67E22` (orange), Medium `#D4AC0D` (yellow/gold), Low `#7F8C8D` (gray)
-- No official DoD/Air Force insignia or seals are used (avoids implying official endorsement) — branding is color/typography only
+- No official DoD/Air Force insignia or seals are used (avoids implying official endorsement) — branding is JLL's own color/typography, since this tool supports the JLL team working the AFCEC account
 
 **Implementation approach:** `st.set_page_config` with a wide layout, a `.streamlit/config.toml` `[theme]` block setting the base palette, plus targeted custom CSS injected via `st.markdown(..., unsafe_allow_html=True)` for card styling, pill-shaped risk badges, and the header bar. Kept in a single `app/ui/styles.py` module so styling stays out of layout logic.
 
-**Header bar:** full-width band in Air Force blue (subtle two-tone gradient from `#00308F` to `#002266` for depth) with white text — a building/skyline icon (generic, not an official insignia) in a softly-tinted circular badge next to the app title "Media Monitoring for Air Force Housing." No separate tagline — the title itself states the app's purpose, so nothing sits below it in the header. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — those are protected marks and using them on an unofficial tool could imply endorsement, which the disclaimer explicitly disclaims. No photography is used either (keeps the app lightweight and avoids image licensing/sourcing questions); the icon + color palette carry the visual identity. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
+**Header bar:** full-width band in JLL Rainbow Red (subtle two-tone gradient from `#E30613` to `#000000` for depth) with white text — a building/skyline icon in a softly-tinted circular badge next to the app title "Media Monitoring for Air Force Housing." No separate tagline — the title itself states the app's purpose, so nothing sits below it in the header. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — those are protected marks and using them on an unofficial tool could imply endorsement, which the disclaimer explicitly disclaims. No photography is used either (keeps the app lightweight and avoids image licensing/sourcing questions); the icon + color palette carry the visual identity. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
 > "This is an unofficial personal tool for media monitoring and risk management, not an official Department of the Air Force system."
 
 **Article cards:** white background, subtle drop shadow for elevation, thin left accent stripe colored by risk level (a common "status stripe" pattern), rounded corners. Risk level shown as a pill-shaped badge with a small icon (colored tint background, darker text of the same hue) rather than the plain-text `[score]` badges from the original digest — e.g. a warning-triangle icon on Critical/High, a dot on Medium/Low. Source and timestamp in muted gray, headline bold, "Read Full Article" as a styled link/button.
 
 **Summary row:** rendered as four metric tiles (`st.metric` or custom CSS tiles) side by side rather than a single caption line — each tile has a subtle shadow, a colored accent stripe, and shows the count with the risk label above it.
 
-**Section headers:** bold label with a short colored underline accent (Air Force blue) beneath it, replacing the plain `st.subheader` default styling, so each section reads as a distinct, designed block rather than default Streamlit text.
+**Section headers:** bold label with a short colored underline accent (JLL Rainbow Red) beneath it, replacing the plain `st.subheader` default styling, so each section reads as a distinct, designed block rather than default Streamlit text.
 
 ## Page Layout
 
@@ -199,7 +200,7 @@ afcec-housing-news-monitor/
 │       ├── dashboard.py           # Header, sidebar filters, summary row, main feed, AF-specific feed
 │       └── styles.py              # Theme colors, custom CSS (cards, badges, header bar)
 ├── .streamlit/
-│   ├── config.toml                # Base Streamlit theme (Air Force blue/silver palette)
+│   ├── config.toml                # Base Streamlit theme (JLL red/black palette)
 │   └── secrets.toml.example       # Documents required ANTHROPIC_API_KEY (not committed)
 ├── requirements.txt                # streamlit, feedparser, anthropic
 └── README.md

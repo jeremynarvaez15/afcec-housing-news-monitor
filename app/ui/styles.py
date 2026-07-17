@@ -3,8 +3,9 @@ from datetime import datetime, timezone
 
 import streamlit as st
 
-AF_BLUE = "#00308F"
-AF_BLUE_DARK = "#002266"
+# JLL brand palette: Rainbow Red primary, black secondary.
+PRIMARY_COLOR = "#E30613"
+SECONDARY_COLOR = "#000000"
 SILVER = "#C0C0C0"
 BG = "#F5F6F8"
 
@@ -107,7 +108,7 @@ def inject_base_styles() -> None:
         }}
         .afhn-section-header {{ font-size: 16px; font-weight: 700; color: #2C2C2A; margin-bottom: 4px; }}
         .afhn-section-underline {{
-            width: 48px; height: 3px; background: {AF_BLUE};
+            width: 48px; height: 3px; background: {PRIMARY_COLOR};
             border-radius: 2px; margin-bottom: 14px;
         }}
         </style>
@@ -125,7 +126,7 @@ def inject_base_styles() -> None:
 
 def render_header_html() -> str:
     return (
-        f'<div style="background:linear-gradient(135deg,{AF_BLUE},{AF_BLUE_DARK});color:#FFFFFF;'
+        f'<div style="background:linear-gradient(135deg,{PRIMARY_COLOR},{SECONDARY_COLOR});color:#FFFFFF;'
         f'padding:20px 24px;border-radius:10px;display:flex;align-items:center;gap:14px;">'
         f'<div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.14);'
         f'display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;">&#127968;</div>'
@@ -169,7 +170,7 @@ def render_resources_section_html(source_names: list[str]) -> str:
     links_html = "".join(
         f'<div style="padding:10px 0;border-bottom:1px solid {SILVER};">'
         f'<a href="{html.escape(link["url"], quote=True)}" '
-        f'style="font-size:14px;font-weight:600;color:{AF_BLUE};">{html.escape(link["name"])}</a>'
+        f'style="font-size:14px;font-weight:600;color:{PRIMARY_COLOR};">{html.escape(link["name"])}</a>'
         f'<div style="font-size:12px;color:#5F5E5A;margin-top:2px;">{html.escape(link["description"])}</div>'
         f'</div>'
         for link in RESOURCE_LINKS
@@ -216,7 +217,7 @@ def render_article_card_html(article: dict) -> str:
         f'</div>'
         f'{summary_html}'
         f'{rationale_html}'
-        f'<div style="font-size:12px;color:#888780;">{meta} &middot; <a href="{url}" style="color:{AF_BLUE};">Read full article</a></div>'
+        f'<div style="font-size:12px;color:#888780;">{meta} &middot; <a href="{url}" style="color:{PRIMARY_COLOR};">Read full article</a></div>'
         f'</div>'
         f'</div>'
     )

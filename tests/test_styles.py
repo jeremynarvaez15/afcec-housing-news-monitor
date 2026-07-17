@@ -21,7 +21,7 @@ def test_how_to_use_text_covers_risk_levels_and_filters():
 def test_render_header_html_contains_title_and_color():
     html = styles.render_header_html()
     assert styles.APP_TITLE in html
-    assert styles.AF_BLUE in html
+    assert styles.PRIMARY_COLOR in html
 
 
 def test_render_resources_section_html_lists_all_orgs():
