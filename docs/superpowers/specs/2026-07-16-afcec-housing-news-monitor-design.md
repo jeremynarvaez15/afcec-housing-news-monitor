@@ -1,4 +1,4 @@
-# AFCEC Military Housing News Monitor — Design Spec
+# Media Monitoring for Air Force Housing — Design Spec
 **Date:** 2026-07-16
 **Status:** Approved
 
@@ -128,7 +128,7 @@ Goal: read as a credible, professional monitoring tool a client and team will tr
 
 **Implementation approach:** `st.set_page_config` with a wide layout, a `.streamlit/config.toml` `[theme]` block setting the base palette, plus targeted custom CSS injected via `st.markdown(..., unsafe_allow_html=True)` for card styling, pill-shaped risk badges, and the header bar. Kept in a single `app/ui/styles.py` module so styling stays out of layout logic.
 
-**Header bar:** full-width band in Air Force blue (subtle two-tone gradient from `#00308F` to `#002266` for depth) with white text — a building/skyline icon (generic, not an official insignia) in a softly-tinted circular badge next to the app title "AFCEC Military Housing News Monitor," with a one-line tagline ("Media monitoring for Air Force Housing") below. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — those are protected marks and using them on an unofficial tool could imply endorsement, which the disclaimer explicitly disclaims. No photography is used either (keeps the app lightweight and avoids image licensing/sourcing questions); the icon + color palette carry the visual identity. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
+**Header bar:** full-width band in Air Force blue (subtle two-tone gradient from `#00308F` to `#002266` for depth) with white text — a building/skyline icon (generic, not an official insignia) in a softly-tinted circular badge next to the app title "Media Monitoring for Air Force Housing." No separate tagline — the title itself states the app's purpose, so nothing sits below it in the header. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — those are protected marks and using them on an unofficial tool could imply endorsement, which the disclaimer explicitly disclaims. No photography is used either (keeps the app lightweight and avoids image licensing/sourcing questions); the icon + color palette carry the visual identity. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
 > "Unofficial personal tool for situational awareness — not an official AFCEC/Air Force system. AI-generated risk levels require human judgment before acting."
 
 **Article cards:** white background, subtle drop shadow for elevation, thin left accent stripe colored by risk level (a common "status stripe" pattern), rounded corners. Risk level shown as a pill-shaped badge with a small icon (colored tint background, darker text of the same hue) rather than the plain-text `[score]` badges from the original digest — e.g. a warning-triangle icon on Critical/High, a dot on Medium/Low. Source and timestamp in muted gray, headline bold, "Read Full Article" as a styled link/button.
@@ -139,7 +139,7 @@ Goal: read as a credible, professional monitoring tool a client and team will tr
 
 ## Page Layout
 
-Single page, wide layout, title "AFCEC Military Housing News Monitor."
+Single page, wide layout, title "Media Monitoring for Air Force Housing."
 
 **Header bar + disclaimer banner** as described above.
 
