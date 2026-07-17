@@ -24,8 +24,9 @@ class _FakeThinkingBlock:
 
 
 class _FakeMessage:
-    def __init__(self, text, content=None):
+    def __init__(self, text, content=None, stop_reason="end_turn"):
         self.content = content if content is not None else [_FakeContent(text)]
+        self.stop_reason = stop_reason
 
 
 class _FakeMessages:
@@ -123,16 +124,17 @@ def test_assess_risk_no_api_key_has_no_risk_error():
 
 
 class _MultiBlockMessages:
-    def __init__(self, content):
+    def __init__(self, content, stop_reason="end_turn"):
         self._content = content
+        self._stop_reason = stop_reason
 
     def create(self, **kwargs):
-        return _FakeMessage(text=None, content=self._content)
+        return _FakeMessage(text=None, content=self._content, stop_reason=self._stop_reason)
 
 
 class _MultiBlockClient:
-    def __init__(self, content):
-        self.messages = _MultiBlockMessages(content)
+    def __init__(self, content, stop_reason="end_turn"):
+        self.messages = _MultiBlockMessages(content, stop_reason=stop_reason)
 
 
 def test_assess_risk_skips_leading_thinking_block_to_find_text(monkeypatch):
@@ -159,3 +161,21 @@ def test_assess_risk_reports_clear_error_when_no_text_block_present(monkeypatch)
 
     assert result[0]["risk_level"] is None
     assert "no text content" in result[0]["risk_error"].lower()
+
+
+def test_assess_risk_reports_clear_error_when_text_block_is_empty(monkeypatch):
+    # A text block that exists but is empty (e.g. output got cut off by
+    # max_tokens before any visible answer was produced) must not silently
+    # fall through to json.loads("") and surface a confusing JSONDecodeError.
+    content = [_FakeContent("")]
+    import anthropic
+    monkeypatch.setattr(
+        anthropic, "Anthropic", lambda api_key: _MultiBlockClient(content, stop_reason="max_tokens")
+    )
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] is None
+    assert "empty text block" in result[0]["risk_error"].lower()
+    assert "max_tokens" in result[0]["risk_error"]

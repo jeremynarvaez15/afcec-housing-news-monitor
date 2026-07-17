@@ -33,10 +33,21 @@ def _extract_text(message) -> str:
     """Return the first text-type content block's text. Claude 5-family models
     can return a leading reasoning/thinking block ahead of the answer, so the
     text block is not guaranteed to be content[0]."""
+    stop_reason = getattr(message, "stop_reason", None)
+    block_types = [getattr(b, "type", "unknown") for b in message.content]
     for block in message.content:
         if getattr(block, "type", None) == "text":
-            return (block.text or "").strip()
-    raise ValueError("Claude response had no text content block")
+            text = (block.text or "").strip()
+            if text:
+                return text
+            raise ValueError(
+                f"Claude returned an empty text block (stop_reason={stop_reason}, "
+                f"blocks={block_types})"
+            )
+    raise ValueError(
+        f"Claude response had no text content block (stop_reason={stop_reason}, "
+        f"blocks={block_types})"
+    )
 
 
 def _assess_one(client, article: dict) -> dict:
