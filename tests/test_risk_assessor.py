@@ -163,6 +163,28 @@ def test_assess_risk_reports_clear_error_when_no_text_block_present(monkeypatch)
     assert "no text content" in result[0]["risk_error"].lower()
 
 
+def test_assess_risk_parses_json_wrapped_in_markdown_code_fence(monkeypatch):
+    fenced = "```json\n" + _response_json(risk_level="Medium") + "\n```"
+    _patch_anthropic(monkeypatch, fenced)
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] == "Medium"
+    assert result[0].get("risk_error") is None
+
+
+def test_assess_risk_parses_json_prefaced_with_prose(monkeypatch):
+    prefaced = "Here is the analysis:\n\n" + _response_json(risk_level="Low")
+    _patch_anthropic(monkeypatch, prefaced)
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] == "Low"
+    assert result[0].get("risk_error") is None
+
+
 def test_assess_risk_reports_clear_error_when_text_block_is_empty(monkeypatch):
     # A text block that exists but is empty (e.g. output got cut off by
     # max_tokens before any visible answer was produced) must not silently

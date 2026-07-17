@@ -50,6 +50,17 @@ def _extract_text(message) -> str:
     )
 
 
+def _extract_json_object(text: str) -> str:
+    """Pull the {...} object out of text that may be wrapped in a markdown code
+    fence (```json ... ```) or prefaced with prose, both of which models commonly
+    do even when told to "return ONLY valid JSON"."""
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        return text  # nothing to extract; let json.loads raise its own error
+    return text[start:end + 1]
+
+
 def _assess_one(client, article: dict) -> dict:
     content = (article.get("description") or "")[:500]
     prompt = _PROMPT.format(title=article.get("title", ""), content=content)
@@ -60,7 +71,7 @@ def _assess_one(client, article: dict) -> dict:
             messages=[{"role": "user", "content": prompt}],
         )
         text = _extract_text(message)
-        parsed = json.loads(text)
+        parsed = json.loads(_extract_json_object(text))
         risk_level = str(parsed.get("risk_level", ""))
         if risk_level not in _VALID_LEVELS:
             risk_level = None
