@@ -29,16 +29,26 @@ _FALLBACK = {
 }
 
 
+def _extract_text(message) -> str:
+    """Return the first text-type content block's text. Claude 5-family models
+    can return a leading reasoning/thinking block ahead of the answer, so the
+    text block is not guaranteed to be content[0]."""
+    for block in message.content:
+        if getattr(block, "type", None) == "text":
+            return (block.text or "").strip()
+    raise ValueError("Claude response had no text content block")
+
+
 def _assess_one(client, article: dict) -> dict:
     content = (article.get("description") or "")[:500]
     prompt = _PROMPT.format(title=article.get("title", ""), content=content)
     try:
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=256,
+            max_tokens=1024,
             messages=[{"role": "user", "content": prompt}],
         )
-        text = message.content[0].text.strip()
+        text = _extract_text(message)
         parsed = json.loads(text)
         risk_level = str(parsed.get("risk_level", ""))
         if risk_level not in _VALID_LEVELS:

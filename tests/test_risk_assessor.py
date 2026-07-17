@@ -13,13 +13,19 @@ def _response_json(risk_level="High", af_specific=True):
 
 
 class _FakeContent:
-    def __init__(self, text):
+    def __init__(self, text, type="text"):
         self.text = text
+        self.type = type
+
+
+class _FakeThinkingBlock:
+    """Simulates a reasoning/thinking content block that has no .text of its own."""
+    type = "thinking"
 
 
 class _FakeMessage:
-    def __init__(self, text):
-        self.content = [_FakeContent(text)]
+    def __init__(self, text, content=None):
+        self.content = content if content is not None else [_FakeContent(text)]
 
 
 class _FakeMessages:
@@ -114,3 +120,42 @@ def test_assess_risk_no_api_key_has_no_risk_error():
     result = assess_risk(articles, api_key="")
 
     assert result[0].get("risk_error") is None
+
+
+class _MultiBlockMessages:
+    def __init__(self, content):
+        self._content = content
+
+    def create(self, **kwargs):
+        return _FakeMessage(text=None, content=self._content)
+
+
+class _MultiBlockClient:
+    def __init__(self, content):
+        self.messages = _MultiBlockMessages(content)
+
+
+def test_assess_risk_skips_leading_thinking_block_to_find_text(monkeypatch):
+    # Claude 5-family models can return a reasoning block ahead of the answer
+    # text; content[0] is not guaranteed to be the text block.
+    content = [_FakeThinkingBlock(), _FakeContent(_response_json(risk_level="High"))]
+    import anthropic
+    monkeypatch.setattr(anthropic, "Anthropic", lambda api_key: _MultiBlockClient(content))
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] == "High"
+    assert result[0].get("risk_error") is None
+
+
+def test_assess_risk_reports_clear_error_when_no_text_block_present(monkeypatch):
+    content = [_FakeThinkingBlock()]
+    import anthropic
+    monkeypatch.setattr(anthropic, "Anthropic", lambda api_key: _MultiBlockClient(content))
+    articles = [{"title": "Some story", "description": "desc", "url": "http://x"}]
+
+    result = assess_risk(articles, api_key="fake-key")
+
+    assert result[0]["risk_level"] is None
+    assert "no text content" in result[0]["risk_error"].lower()
