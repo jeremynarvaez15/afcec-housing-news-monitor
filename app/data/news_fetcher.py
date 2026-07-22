@@ -17,6 +17,21 @@ _FEEDS = [
     {"url": "https://www.af.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1", "source": "AF.mil"},
     {"url": "https://feeds.bbci.co.uk/news/world/rss.xml", "source": "BBC News"},
     {"url": "https://feeds.npr.org/1001/rss.xml", "source": "NPR"},
+    # Google News search RSS: an unofficial but free endpoint that searches across
+    # virtually every site Google News indexes, not just our hand-picked list.
+    # entry.source.title (the real publisher, e.g. "Project On Government Oversight")
+    # is used instead of this label wherever feedparser exposes it — see _fetch_feed.
+    {
+        "url": "https://news.google.com/rss/search?q=%22military%20housing%20privatization%22%20OR%20MHPI%20OR%20%22privatized%20military%20housing%22&hl=en-US&gl=US&ceid=US:en",
+        "source": "Google News",
+    },
+    {
+        # Bare "barracks" was tried first and matched too much unrelated content
+        # (Vermont State Police stations are called "barracks," plus street names,
+        # historical sites) — qualified phrases below cut that noise out.
+        "url": "https://news.google.com/rss/search?q=%22military%20barracks%22%20OR%20%22Army%20barracks%22%20OR%20%22Air%20Force%20barracks%22%20OR%20%22Marine%20barracks%22%20OR%20%22military%20dorms%22%20OR%20%22DoD%20housing%22%20OR%20%22base%20housing%22&hl=en-US&gl=US&ceid=US:en",
+        "source": "Google News",
+    },
 ]
 
 _TOPIC_KEYWORDS = {
@@ -103,11 +118,13 @@ def _fetch_feed(feed_cfg: dict) -> list[dict]:
                 continue
             if not _matches_keywords(title, description):
                 continue
+            entry_source = getattr(entry, "source", None)
+            source_name = getattr(entry_source, "title", None) or feed_cfg["source"]
             articles.append({
                 "title": title,
                 "description": description[:500],
                 "url": url,
-                "source": feed_cfg["source"],
+                "source": source_name,
                 "published_at": _parse_date(entry),
             })
         return articles

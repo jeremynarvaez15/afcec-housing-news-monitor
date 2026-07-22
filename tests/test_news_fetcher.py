@@ -56,6 +56,31 @@ def test_name_matches_rejects_short_ambiguous_name():
     assert _name_matches("JL", "jl properties announced today") is False
 
 
+def test_fetch_housing_articles_uses_entry_source_title_when_present(monkeypatch):
+    # Google News search results carry the real publisher in entry.source.title —
+    # prefer that over the generic "Google News" feed label.
+    entry = _entry(title="MHPI report released", summary="details", link="http://gn", hours_ago=1)
+    entry.source = SimpleNamespace(title="Project On Government Oversight", href="https://www.pogo.org")
+    fake_parsed = SimpleNamespace(entries=[entry])
+    monkeypatch.setattr(news_fetcher.feedparser, "parse", lambda url: fake_parsed)
+
+    articles = fetch_housing_articles()
+
+    assert len(articles) == 1
+    assert articles[0]["source"] == "Project On Government Oversight"
+
+
+def test_fetch_housing_articles_falls_back_to_feed_label_without_entry_source(monkeypatch):
+    entry = _entry(title="MHPI review at base", summary="details", link="http://x", hours_ago=1)
+    fake_parsed = SimpleNamespace(entries=[entry])
+    monkeypatch.setattr(news_fetcher.feedparser, "parse", lambda url: fake_parsed)
+
+    articles = fetch_housing_articles()
+
+    assert len(articles) == 1
+    assert articles[0]["source"] == "Military.com"  # first feed in _FEEDS
+
+
 def test_fetch_housing_articles_filters_by_keyword_and_recency(monkeypatch):
     entries = [
         _entry(title="MHPI review at base", summary="details", link="http://a", hours_ago=1),
