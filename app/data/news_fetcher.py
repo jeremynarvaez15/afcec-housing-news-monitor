@@ -1,9 +1,9 @@
 import feedparser
 from datetime import datetime, timezone, timedelta
 
-_RECENCY_HOURS = 168  # 7 days — housing-specific coverage is infrequent enough that
-# a 48-hour window regularly missed real stories (verified live: articles were found
-# sitting just past the 48h cutoff, e.g. at 68.8h and 48.3h old).
+_RECENCY_HOURS = 336  # 14 days — widened from 7 days (which itself replaced an
+# original 48h window that regularly missed real stories) to give even more
+# margin against the same infrequent-coverage problem.
 
 # defense.gov redirects to war.gov (Department of War rename); this is the live URL.
 _FEEDS = [

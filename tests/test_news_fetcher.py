@@ -60,7 +60,7 @@ def test_fetch_housing_articles_filters_by_keyword_and_recency(monkeypatch):
     entries = [
         _entry(title="MHPI review at base", summary="details", link="http://a", hours_ago=1),
         _entry(title="Local team wins game", summary="details", link="http://b", hours_ago=1),
-        _entry(title="Barracks mold found", summary="details", link="http://c", hours_ago=200),
+        _entry(title="Barracks mold found", summary="details", link="http://c", hours_ago=400),
     ]
     fake_parsed = SimpleNamespace(entries=entries)
     monkeypatch.setattr(news_fetcher.feedparser, "parse", lambda url: fake_parsed)

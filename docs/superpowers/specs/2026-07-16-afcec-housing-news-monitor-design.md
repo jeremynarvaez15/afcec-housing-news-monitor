@@ -15,7 +15,7 @@ A standalone Streamlit app that monitors media coverage of military housing prog
 - New standalone repo and Streamlit Cloud deployment (not a tab in the existing swing-scanner app)
 - Keyword-based monitoring only — no dedicated per-company sections
 - Refreshes every 60 minutes (cached to control API costs)
-- Articles retained for 1 week (168 hours) from publish time, then drop out of the feed. (Originally 48 hours; widened after live verification showed housing-specific coverage is infrequent enough that a 48-hour window regularly missed real stories that were only 1-3 hours past the cutoff.)
+- Articles retained for 2 weeks (336 hours) from publish time, then drop out of the feed. (Originally 48 hours, widened to 1 week after live verification showed housing-specific coverage is infrequent enough that a 48-hour window regularly missed real stories; widened again to 2 weeks per user request for more margin.)
 - Requires one API key: `ANTHROPIC_API_KEY` (user already has one)
 - No database — live snapshot only, backed by RSS recency filtering
 
@@ -166,7 +166,7 @@ Single page, wide layout, title "Media Monitoring for Air Force Housing."
 
 ### Section 2: ✈️ Air Force / Space Force Specific
 - Same card format, filtered to `af_specific=true` (in addition to sidebar filters)
-- Empty state: "No Air Force/Space Force-specific stories in the last week. Check back soon."
+- Empty state: "No Air Force/Space Force-specific stories in the last 2 weeks. Check back soon."
 
 ---
 

@@ -127,7 +127,7 @@ def render_dashboard(
     st.sidebar.caption(f"Last refreshed: {last_refreshed}")
 
     if not articles:
-        st.warning("No housing-related coverage found in the last week.")
+        st.warning("No housing-related coverage found in the last 2 weeks.")
         if feed_diagnostics:
             _render_feed_diagnostics(feed_diagnostics)
         _render_resources_section(source_names)
@@ -154,7 +154,7 @@ def render_dashboard(
     with st.expander("Air Force / Space Force Specific"):
         _render_af_specific_cards(
             af_feed,
-            "No Air Force/Space Force-specific stories in the last week. Check back soon.",
+            "No Air Force/Space Force-specific stories in the last 2 weeks. Check back soon.",
         )
 
     _render_resources_section(source_names)
