@@ -23,14 +23,14 @@ _FEEDS = [
     # is used instead of this label wherever feedparser exposes it — see _fetch_feed.
     {
         "url": "https://news.google.com/rss/search?q=%22military%20housing%20privatization%22%20OR%20MHPI%20OR%20%22privatized%20military%20housing%22&hl=en-US&gl=US&ceid=US:en",
-        "source": "Google News",
+        "source": "Google News (broad web search)",
     },
     {
         # Bare "barracks" was tried first and matched too much unrelated content
         # (Vermont State Police stations are called "barracks," plus street names,
         # historical sites) — qualified phrases below cut that noise out.
         "url": "https://news.google.com/rss/search?q=%22military%20barracks%22%20OR%20%22Army%20barracks%22%20OR%20%22Air%20Force%20barracks%22%20OR%20%22Marine%20barracks%22%20OR%20%22military%20dorms%22%20OR%20%22DoD%20housing%22%20OR%20%22base%20housing%22&hl=en-US&gl=US&ceid=US:en",
-        "source": "Google News",
+        "source": "Google News (broad web search)",
     },
 ]
 
