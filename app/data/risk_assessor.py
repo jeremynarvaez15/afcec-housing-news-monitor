@@ -99,28 +99,39 @@ def _assess_one(client, article: dict) -> dict:
 _SUMMARY_PROMPT = """\
 You are a risk analyst for an Air Force Civil Engineer Center (AFCEC) consultant. Below is a
 list of recent housing-related news articles, each already assessed for risk to the Air Force.
-Write a short executive summary — 2 to 4 sentences of plain prose, no markdown, no headers —
-covering: how much coverage there was, the highest-risk items and why they matter, and whether
-anything is specifically about the Air Force or Space Force. If nothing stands out, say so
-plainly rather than padding the summary.
+Counts are handled separately — your job is only to write a short narrative per risk tier.
+
+For each of the Critical, High, and Medium tiers: if there is at least one article at that
+tier, write one plain-prose sentence (no markdown) summarizing what's notable about those
+articles, mentioning Air Force/Space Force specifically if any are AF/SSF-specific. If a tier
+has zero articles, use an empty string for that tier.
+
+Return ONLY valid JSON with these exact keys:
+- critical_summary: one sentence, or "" if there are no Critical articles
+- high_summary: one sentence, or "" if there are no High articles
+- medium_summary: one sentence, or "" if there are no Medium articles
 
 Articles:
 {article_list}
 """
 
 
-def generate_weekly_summary(articles: list[dict], api_key: str) -> str:
-    """One-paragraph AI executive summary of the current article set. Returns ""
-    if there's no key, no articles, or the summary call fails for any reason —
-    callers should simply omit the summary section in that case, never crash."""
+def generate_weekly_summary(articles: list[dict], api_key: str) -> dict | None:
+    """AI-written one-sentence narrative per risk tier (critical_summary,
+    high_summary, medium_summary — each possibly ""). Returns None if there's no
+    key, no articles, or the call fails/is unparseable for any reason — callers
+    should omit the summary section entirely in that case, never crash. Counts
+    are deliberately NOT asked of the AI; use summary_counts() from filters.py,
+    since arithmetic the AI could get wrong shouldn't be trusted over code that
+    can't."""
     if not api_key or not articles:
-        return ""
+        return None
 
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=api_key)
     except Exception:
-        return ""
+        return None
 
     lines = []
     for a in articles:
@@ -132,12 +143,18 @@ def generate_weekly_summary(articles: list[dict], api_key: str) -> str:
     try:
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=300,
+            max_tokens=400,
             messages=[{"role": "user", "content": prompt}],
         )
-        return _extract_text(message)
+        text = _extract_text(message)
+        parsed = json.loads(_extract_json_object(text))
+        return {
+            "critical_summary": str(parsed.get("critical_summary", "")),
+            "high_summary": str(parsed.get("high_summary", "")),
+            "medium_summary": str(parsed.get("medium_summary", "")),
+        }
     except Exception:
-        return ""
+        return None
 
 
 def assess_risk(articles: list[dict], api_key: str) -> list[dict]:

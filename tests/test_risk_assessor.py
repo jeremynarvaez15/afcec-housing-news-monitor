@@ -216,32 +216,57 @@ def test_assess_risk_reports_clear_error_when_text_block_is_empty(monkeypatch):
     assert "max_tokens" in result[0]["risk_error"]
 
 
-def test_generate_weekly_summary_returns_ai_text(monkeypatch):
-    _patch_anthropic(monkeypatch, "Two stories this week, one Critical involving a barracks lawsuit.")
+def _summary_response_json(critical="", high="", medium=""):
+    return json.dumps({
+        "critical_summary": critical,
+        "high_summary": high,
+        "medium_summary": medium,
+    })
+
+
+def test_generate_weekly_summary_returns_per_tier_narrative(monkeypatch):
+    _patch_anthropic(monkeypatch, _summary_response_json(
+        critical="A barracks lawsuit alleges mold exposure at a Texas installation.",
+        high="",
+        medium="",
+    ))
     articles = [
         {"title": "Lawsuit over barracks", "risk_level": "Critical", "af_specific": True},
         {"title": "Routine ribbon cutting", "risk_level": "Low", "af_specific": False},
     ]
 
-    summary = generate_weekly_summary(articles, api_key="fake-key")
+    result = generate_weekly_summary(articles, api_key="fake-key")
 
-    assert summary == "Two stories this week, one Critical involving a barracks lawsuit."
+    assert result == {
+        "critical_summary": "A barracks lawsuit alleges mold exposure at a Texas installation.",
+        "high_summary": "",
+        "medium_summary": "",
+    }
 
 
-def test_generate_weekly_summary_no_api_key_returns_empty_string():
+def test_generate_weekly_summary_no_api_key_returns_none():
     articles = [{"title": "Some story", "risk_level": "Low", "af_specific": False}]
-    assert generate_weekly_summary(articles, api_key="") == ""
+    assert generate_weekly_summary(articles, api_key="") is None
 
 
-def test_generate_weekly_summary_no_articles_returns_empty_string():
-    assert generate_weekly_summary([], api_key="fake-key") == ""
+def test_generate_weekly_summary_no_articles_returns_none():
+    assert generate_weekly_summary([], api_key="fake-key") is None
 
 
-def test_generate_weekly_summary_api_failure_returns_empty_string(monkeypatch):
+def test_generate_weekly_summary_api_failure_returns_none(monkeypatch):
     import anthropic
     monkeypatch.setattr(anthropic, "Anthropic", lambda api_key: _RaisingClient())
     articles = [{"title": "Some story", "risk_level": "Low", "af_specific": False}]
 
-    summary = generate_weekly_summary(articles, api_key="fake-key")
+    result = generate_weekly_summary(articles, api_key="fake-key")
 
-    assert summary == ""
+    assert result is None
+
+
+def test_generate_weekly_summary_unparseable_response_returns_none(monkeypatch):
+    _patch_anthropic(monkeypatch, "not valid json")
+    articles = [{"title": "Some story", "risk_level": "Low", "af_specific": False}]
+
+    result = generate_weekly_summary(articles, api_key="fake-key")
+
+    assert result is None

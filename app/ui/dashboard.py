@@ -113,14 +113,17 @@ def render_dashboard(
     last_refreshed: str,
     source_names: list[str],
     feed_diagnostics: list[dict] | None = None,
-    weekly_summary: str = "",
+    weekly_summary: dict | None = None,
 ) -> bool:
     inject_base_styles()
     st.markdown(render_header_html(), unsafe_allow_html=True)
     st.markdown(render_disclaimer_html(), unsafe_allow_html=True)
 
-    if weekly_summary:
-        st.markdown(render_weekly_summary_html(weekly_summary), unsafe_allow_html=True)
+    if weekly_summary is not None:
+        summary_html = render_weekly_summary_html(
+            total=len(articles), counts=summary_counts(articles), narrative=weekly_summary
+        )
+        st.markdown(summary_html, unsafe_allow_html=True)
 
     with st.expander("How to Use This Site"):
         st.markdown(HOW_TO_USE_TEXT)

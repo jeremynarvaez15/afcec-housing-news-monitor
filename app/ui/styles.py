@@ -177,15 +177,33 @@ def render_section_header_html(label: str) -> str:
     )
 
 
-def render_weekly_summary_html(summary_text: str) -> str:
-    # Strip newlines before escaping — the AI-generated text isn't guaranteed
-    # to be single-line, and an embedded newline here would trigger the same
+def _clean_narrative(text: str) -> str:
+    # Strip newlines before escaping — AI-generated text isn't guaranteed to be
+    # single-line, and an embedded newline here would trigger the same
     # blank-line-breaks-the-HTML-block issue documented above.
-    text = html.escape(summary_text.replace("\n", " ").strip())
+    return html.escape((text or "").replace("\n", " ").strip())
+
+
+def render_weekly_summary_html(total: int, counts: dict, narrative: dict) -> str:
+    """Counts (total + per-tier) come from our own code (summary_counts() in
+    filters.py, plus len(articles)) — never from the AI, which shouldn't be
+    trusted to count reliably. narrative supplies the qualitative one-liner
+    per tier from generate_weekly_summary(), which may be empty per tier."""
+    def bullet(label: str, count: int, text: str) -> str:
+        clean = _clean_narrative(text)
+        suffix = f": {clean}" if clean else ""
+        return f'<li><strong>{label}</strong> ({count}){suffix}</li>'
+
+    items = (
+        f'<li><strong>Total stories identified:</strong> {total}</li>'
+        + bullet("Critical", counts.get("Critical", 0), narrative.get("critical_summary", ""))
+        + bullet("High", counts.get("High", 0), narrative.get("high_summary", ""))
+        + bullet("Medium", counts.get("Medium", 0), narrative.get("medium_summary", ""))
+    )
     return (
         f'<div class="afhn-card" style="display:block;padding:14px 18px;">'
         f'<div style="font-size:13px;font-weight:600;color:#2C2C2A;margin-bottom:6px;">Coverage summary</div>'
-        f'<div style="font-size:14px;color:#333333;line-height:1.5;">{text}</div>'
+        f'<ul style="margin:0;padding-left:18px;font-size:14px;color:#333333;line-height:1.7;">{items}</ul>'
         f'</div>'
     )
 

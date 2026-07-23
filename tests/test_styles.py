@@ -18,12 +18,37 @@ def test_how_to_use_text_covers_risk_levels_and_filters():
         assert term in styles.HOW_TO_USE_TEXT
 
 
-def test_render_weekly_summary_html_contains_escaped_text_and_no_newlines():
-    html_out = styles.render_weekly_summary_html("Two stories this week.\nOne is <Critical>.")
-    assert "Two stories this week." in html_out
-    assert "&lt;Critical&gt;" in html_out
-    assert "<Critical>" not in html_out
+def test_render_weekly_summary_html_lists_total_and_each_tier():
+    counts = {"Critical": 2, "High": 1, "Medium": 0, "Low": 3}
+    narrative = {
+        "critical_summary": "A barracks lawsuit alleges mold exposure.",
+        "high_summary": "",
+        "medium_summary": "",
+    }
+    html_out = styles.render_weekly_summary_html(total=6, counts=counts, narrative=narrative)
+
+    assert "Total stories identified" in html_out
+    assert "6</li>" in html_out
+    assert "Critical" in html_out and "(2)" in html_out
+    assert "A barracks lawsuit alleges mold exposure." in html_out
+    assert "High" in html_out and "(1)" in html_out
+    assert "Medium" in html_out and "(0)" in html_out
+
+
+def test_render_weekly_summary_html_escapes_and_strips_newlines_from_narrative():
+    counts = {"Critical": 1, "High": 0, "Medium": 0, "Low": 0}
+    narrative = {"critical_summary": "Line one.\n<script>bad</script>", "high_summary": "", "medium_summary": ""}
+    html_out = styles.render_weekly_summary_html(total=1, counts=counts, narrative=narrative)
+
+    assert "&lt;script&gt;" in html_out
+    assert "<script>" not in html_out
     assert "\n" not in html_out
+
+
+def test_render_weekly_summary_html_has_no_embedded_newlines():
+    counts = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
+    narrative = {"critical_summary": "", "high_summary": "", "medium_summary": ""}
+    assert "\n" not in styles.render_weekly_summary_html(total=0, counts=counts, narrative=narrative)
 
 
 def test_render_header_html_contains_title_and_logo():
