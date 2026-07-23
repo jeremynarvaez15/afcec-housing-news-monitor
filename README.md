@@ -1,4 +1,4 @@
-# Media Monitoring for Air Force Housing
+# Media Monitor for Military Housing
 
 An unofficial personal tool that monitors media coverage of military housing programs
 — MHPI, privatized housing, dorms, barracks, and DoD-owned housing — summarizes each

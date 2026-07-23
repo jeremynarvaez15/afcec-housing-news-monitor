@@ -7,7 +7,7 @@ from app.data.risk_assessor import assess_risk, generate_weekly_summary
 from app.ui.dashboard import render_dashboard
 
 st.set_page_config(
-    page_title="Media Monitoring for Air Force Housing",
+    page_title="Media Monitor for Military Housing",
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="collapsed",

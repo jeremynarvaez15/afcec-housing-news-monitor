@@ -1,4 +1,4 @@
-# Media Monitoring for Air Force Housing — Design Spec
+# Media Monitor for Military Housing — Design Spec
 **Date:** 2026-07-16
 **Status:** Approved
 
@@ -129,7 +129,7 @@ Goal: read as a credible, professional monitoring tool a client and team will tr
 
 **Implementation approach:** `st.set_page_config` with a wide layout, a `.streamlit/config.toml` `[theme]` block setting the base palette, plus targeted custom CSS injected via `st.markdown(..., unsafe_allow_html=True)` for card styling, pill-shaped risk badges, and the header bar. Kept in a single `app/ui/styles.py` module so styling stays out of layout logic.
 
-**Header bar:** full-width band in solid JLL black (`#000000`) with white text — the actual JLL logo (red globe emblem + white "JLL" wordmark, provided by the user as `app/ui/assets/jll_logo.png`, embedded as a base64 data URI so no separate static-file-serving config is needed) on the left, next to the app title "Media Monitoring for Air Force Housing." Solid black rather than a gradient so the header blends seamlessly with the logo's own black background. No separate tagline — the title itself states the app's purpose, so nothing sits below it in the header. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — JLL's own logo is appropriate since the user works there and this tool supports their team's AFCEC account work. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
+**Header bar:** full-width band in solid JLL black (`#000000`) with white text — the actual JLL logo (red globe emblem + white "JLL" wordmark, provided by the user as `app/ui/assets/jll_logo.png`, embedded as a base64 data URI so no separate static-file-serving config is needed) on the left, next to the app title "Media Monitor for Military Housing." Solid black rather than a gradient so the header blends seamlessly with the logo's own black background. No separate tagline — the title itself states the app's purpose, so nothing sits below it in the header. No official DoD/Air Force seal, roundel, or insignia is used anywhere in the app — JLL's own logo is appropriate since the user works there and this tool supports their team's AFCEC account work. Disclaimer banner sits directly below the header, styled as a subtle callout (not alarming red) since it's a standing notice, not an error:
 > "This is an unofficial personal tool for media monitoring and risk management, not an official Department of the Air Force system."
 
 **Article cards:** white background, subtle drop shadow for elevation, thin left accent stripe colored by risk level (a common "status stripe" pattern), rounded corners. Risk level shown as a pill-shaped badge with a small icon (colored tint background, darker text of the same hue) rather than the plain-text `[score]` badges from the original digest — e.g. a warning-triangle icon on Critical/High, a dot on Medium/Low. Source and timestamp in muted gray, headline bold, "Read Full Article" as a styled link/button.
@@ -140,7 +140,7 @@ Goal: read as a credible, professional monitoring tool a client and team will tr
 
 ## Page Layout
 
-Single page, wide layout, title "Media Monitoring for Air Force Housing."
+Single page, wide layout, title "Media Monitor for Military Housing."
 
 **Header bar + disclaimer banner** as described above.
 

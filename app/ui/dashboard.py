@@ -31,6 +31,8 @@ def _render_sidebar() -> tuple[set, bool, str, bool]:
     af_only = st.sidebar.checkbox("Air Force / Space Force specific only", value=False)
     query = st.sidebar.text_input("Search articles", value="")
     refresh_clicked = st.sidebar.button("Refresh now")
+    with st.sidebar.expander("How to Use This Site"):
+        st.markdown(HOW_TO_USE_TEXT)
     return selected, af_only, query, refresh_clicked
 
 
@@ -124,9 +126,6 @@ def render_dashboard(
             total=len(articles), counts=summary_counts(articles), narrative=weekly_summary
         )
         st.markdown(summary_html, unsafe_allow_html=True)
-
-    with st.expander("How to Use This Site"):
-        st.markdown(HOW_TO_USE_TEXT)
 
     if key_missing:
         st.info("Add ANTHROPIC_API_KEY to your secrets to enable risk assessment.")

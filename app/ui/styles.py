@@ -22,7 +22,7 @@ def _logo_data_uri() -> str:
         _logo_data_uri_cache = f"data:image/png;base64,{encoded}"
     return _logo_data_uri_cache
 
-APP_TITLE = "Media Monitoring for Air Force Housing"
+APP_TITLE = "Media Monitor for Military Housing"
 DISCLAIMER_TEXT = (
     "This is an unofficial personal tool for media monitoring and risk management, "
     "not an official Department of the Air Force system."
