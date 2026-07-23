@@ -96,6 +96,50 @@ def _assess_one(client, article: dict) -> dict:
         return {**_FALLBACK, "risk_error": f"{type(e).__name__}: {e}"}
 
 
+_SUMMARY_PROMPT = """\
+You are a risk analyst for an Air Force Civil Engineer Center (AFCEC) consultant. Below is a
+list of recent housing-related news articles, each already assessed for risk to the Air Force.
+Write a short executive summary — 2 to 4 sentences of plain prose, no markdown, no headers —
+covering: how much coverage there was, the highest-risk items and why they matter, and whether
+anything is specifically about the Air Force or Space Force. If nothing stands out, say so
+plainly rather than padding the summary.
+
+Articles:
+{article_list}
+"""
+
+
+def generate_weekly_summary(articles: list[dict], api_key: str) -> str:
+    """One-paragraph AI executive summary of the current article set. Returns ""
+    if there's no key, no articles, or the summary call fails for any reason —
+    callers should simply omit the summary section in that case, never crash."""
+    if not api_key or not articles:
+        return ""
+
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=api_key)
+    except Exception:
+        return ""
+
+    lines = []
+    for a in articles:
+        level = a.get("risk_level") or "Unrated"
+        af_tag = " (AF/SSF-specific)" if a.get("af_specific") else ""
+        lines.append(f"- [{level}]{af_tag} {a.get('title', '')}")
+    prompt = _SUMMARY_PROMPT.format(article_list="\n".join(lines))
+
+    try:
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=300,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return _extract_text(message)
+    except Exception:
+        return ""
+
+
 def assess_risk(articles: list[dict], api_key: str) -> list[dict]:
     """Enrich each article dict with an AI risk assessment. Safe to call with empty api_key."""
     if not api_key or not articles:

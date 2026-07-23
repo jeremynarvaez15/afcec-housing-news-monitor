@@ -15,6 +15,7 @@ from app.ui.styles import (
     render_section_header_html,
     render_article_card_html,
     render_resources_section_html,
+    render_weekly_summary_html,
     HOW_TO_USE_TEXT,
 )
 
@@ -112,10 +113,14 @@ def render_dashboard(
     last_refreshed: str,
     source_names: list[str],
     feed_diagnostics: list[dict] | None = None,
+    weekly_summary: str = "",
 ) -> bool:
     inject_base_styles()
     st.markdown(render_header_html(), unsafe_allow_html=True)
     st.markdown(render_disclaimer_html(), unsafe_allow_html=True)
+
+    if weekly_summary:
+        st.markdown(render_weekly_summary_html(weekly_summary), unsafe_allow_html=True)
 
     with st.expander("How to Use This Site"):
         st.markdown(HOW_TO_USE_TEXT)

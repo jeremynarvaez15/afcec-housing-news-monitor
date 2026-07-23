@@ -1,6 +1,6 @@
 import json
 
-from app.data.risk_assessor import assess_risk
+from app.data.risk_assessor import assess_risk, generate_weekly_summary
 
 
 def _response_json(risk_level="High", af_specific=True):
@@ -214,3 +214,34 @@ def test_assess_risk_reports_clear_error_when_text_block_is_empty(monkeypatch):
     assert result[0]["risk_level"] is None
     assert "empty text block" in result[0]["risk_error"].lower()
     assert "max_tokens" in result[0]["risk_error"]
+
+
+def test_generate_weekly_summary_returns_ai_text(monkeypatch):
+    _patch_anthropic(monkeypatch, "Two stories this week, one Critical involving a barracks lawsuit.")
+    articles = [
+        {"title": "Lawsuit over barracks", "risk_level": "Critical", "af_specific": True},
+        {"title": "Routine ribbon cutting", "risk_level": "Low", "af_specific": False},
+    ]
+
+    summary = generate_weekly_summary(articles, api_key="fake-key")
+
+    assert summary == "Two stories this week, one Critical involving a barracks lawsuit."
+
+
+def test_generate_weekly_summary_no_api_key_returns_empty_string():
+    articles = [{"title": "Some story", "risk_level": "Low", "af_specific": False}]
+    assert generate_weekly_summary(articles, api_key="") == ""
+
+
+def test_generate_weekly_summary_no_articles_returns_empty_string():
+    assert generate_weekly_summary([], api_key="fake-key") == ""
+
+
+def test_generate_weekly_summary_api_failure_returns_empty_string(monkeypatch):
+    import anthropic
+    monkeypatch.setattr(anthropic, "Anthropic", lambda api_key: _RaisingClient())
+    articles = [{"title": "Some story", "risk_level": "Low", "af_specific": False}]
+
+    summary = generate_weekly_summary(articles, api_key="fake-key")
+
+    assert summary == ""

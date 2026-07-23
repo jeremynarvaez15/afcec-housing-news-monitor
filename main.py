@@ -3,7 +3,7 @@ import time
 import streamlit as st
 
 from app.data.news_fetcher import fetch_housing_articles, fetch_feed_diagnostics, get_source_names
-from app.data.risk_assessor import assess_risk
+from app.data.risk_assessor import assess_risk, generate_weekly_summary
 from app.ui.dashboard import render_dashboard
 
 st.set_page_config(
@@ -31,14 +31,16 @@ def _get_api_key() -> str:
 def load_housing_news(_cache_buster: int):
     anthropic_key = _get_api_key()
     articles = fetch_housing_articles()
-    return assess_risk(articles, anthropic_key)
+    assessed = assess_risk(articles, anthropic_key)
+    summary = generate_weekly_summary(assessed, anthropic_key)
+    return assessed, summary
 
 
 anthropic_key = _get_api_key()
 cache_buster = int(time.time() // _REFRESH_INTERVAL)
 
 with st.spinner("Loading housing news coverage..."):
-    articles = load_housing_news(cache_buster)
+    articles, weekly_summary = load_housing_news(cache_buster)
 
 feed_diagnostics = None
 if not articles:
@@ -53,6 +55,7 @@ refresh_clicked = render_dashboard(
     last_refreshed=last_refreshed,
     source_names=get_source_names(),
     feed_diagnostics=feed_diagnostics,
+    weekly_summary=weekly_summary,
 )
 
 if refresh_clicked:

@@ -24,6 +24,7 @@ def _patch_data_layer(monkeypatch, api_key=""):
 
     monkeypatch.setattr(news_fetcher, "fetch_housing_articles", lambda: [_FAKE_ARTICLE])
     monkeypatch.setattr(risk_assessor, "assess_risk", lambda articles, api_key: [_FAKE_ASSESSED])
+    monkeypatch.setattr(risk_assessor, "generate_weekly_summary", lambda articles, api_key: "Test coverage summary.")
     # Force st.secrets to a known value regardless of any local secrets.toml,
     # so these tests are deterministic on every machine. main.py checks
     # load_if_toml_exists() before calling get() (to avoid the st.error banner
