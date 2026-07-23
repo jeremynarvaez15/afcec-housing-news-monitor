@@ -10,6 +10,7 @@ st.set_page_config(
     page_title="Media Monitoring for Air Force Housing",
     page_icon="🏠",
     layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 _REFRESH_INTERVAL = 3600
