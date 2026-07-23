@@ -72,6 +72,34 @@ def test_sort_by_risk_puts_unrated_last():
     assert result[1]["risk_level"] is None
 
 
+def test_sort_by_risk_orders_newest_first_within_same_level():
+    articles = [
+        _article(risk_level="Critical", url="http://old", published_at="2026-07-10T00:00:00+00:00"),
+        _article(risk_level="Critical", url="http://new", published_at="2026-07-17T00:00:00+00:00"),
+        _article(risk_level="Critical", url="http://mid", published_at="2026-07-14T00:00:00+00:00"),
+    ]
+    result = sort_by_risk(articles)
+    assert [a["url"] for a in result] == ["http://new", "http://mid", "http://old"]
+
+
+def test_sort_by_risk_date_order_does_not_override_risk_level():
+    articles = [
+        _article(risk_level="Low", url="http://newer-but-lower-risk", published_at="2026-07-17T00:00:00+00:00"),
+        _article(risk_level="Critical", url="http://older-but-higher-risk", published_at="2026-07-01T00:00:00+00:00"),
+    ]
+    result = sort_by_risk(articles)
+    assert [a["url"] for a in result] == ["http://older-but-higher-risk", "http://newer-but-lower-risk"]
+
+
+def test_sort_by_risk_handles_missing_published_at_gracefully():
+    articles = [
+        _article(risk_level="Critical", url="http://dated", published_at="2026-07-17T00:00:00+00:00"),
+        _article(risk_level="Critical", url="http://undated", published_at=""),
+    ]
+    result = sort_by_risk(articles)
+    assert [a["url"] for a in result] == ["http://dated", "http://undated"]
+
+
 def test_summary_counts_tallies_each_level():
     articles = [_article(risk_level="Critical"), _article(risk_level="Critical"), _article(risk_level="Low")]
     counts = summary_counts(articles)

@@ -23,7 +23,13 @@ def filter_by_keyword(articles: list[dict], query: str) -> list[dict]:
 
 
 def sort_by_risk(articles: list[dict]) -> list[dict]:
-    return sorted(articles, key=lambda a: _RISK_ORDER.get(a.get("risk_level"), 4))
+    # Two-pass stable sort: order by date (newest first) first, then by risk
+    # level — Python's sort is stable, so within each risk tier the relative
+    # (already-descending) date order from the first pass is preserved.
+    # published_at is a UTC ISO 8601 string, which sorts correctly as plain
+    # text without needing to parse it into a datetime.
+    by_date_desc = sorted(articles, key=lambda a: a.get("published_at") or "", reverse=True)
+    return sorted(by_date_desc, key=lambda a: _RISK_ORDER.get(a.get("risk_level"), 4))
 
 
 def summary_counts(articles: list[dict]) -> dict:
